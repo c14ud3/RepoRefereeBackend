@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(): Response
+    public function app_home(): Response
     {
 		return new Response('The application is running.');
     }
