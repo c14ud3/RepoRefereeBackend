@@ -2,26 +2,32 @@
 
 ## Request
 
-| Parameter       | Expected content                                             |
-| --------------- | ------------------------------------------------------------ |
-| url             | (STRING) URL to the comment (used for link in Google Sheets) |
-| title           | (STRING) Title of the conversation/bug                       |
-| comment         | (STRING) Comment to be checked                               |
-| contextComments | (JSON-STRING: ARRAY with STRINGS) Previous comments          |
+```
+GET https://{YOUR-DOMAIN}/comment/{AUTH-TOKEN}
+```
+
+The following attributes hereby have to be transmitted:
+
+| Attribute         | Expected content                                             |
+| ---------------   | ------------------------------------------------------------ |
+| `url`             | (STRING) URL to the comment (used for link in Google Sheets) |
+| `title`           | (STRING) Title of the conversation/bug                       |
+| `comment`         | (STRING) Comment to be checked                               |
+| `contextComments` | (JSON-STRING: ARRAY with STRINGS) Previous comments            |
 
 ### Example request
 ```Python
 import requests, json
 
-res = requests.get('https://{your-domain}.com/comment/{AUTH-TOKEN}', {
+res = requests.get('https://{YOUR-DOMAIN}/comment/{AUTH-TOKEN}', {
 	"url": "https://bugzilla.mozilla.org/show_bug.cgi?id={XXX}",
 	"title": "Test",
 	"contextComments": json.dumps([
-		"Message 1",
-		"Message 2"
+		"Hello, this is a test.",
+		"Hey there, that's a test too :)"
 	]),
 	"comment": "This is a very very rude test comment!!!"
-}).content
+})
 ```
 
 ## Response
