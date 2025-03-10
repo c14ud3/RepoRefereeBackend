@@ -17,13 +17,37 @@ final class CommentController extends AbstractController
     {
 		if (!AuthService::check($auth))
 			return new Response('Unauthorized', 401);
-		
+
 		try
 		{
-			if(!isset($_REQUEST['comment']))
-				return new Response('Attribute \'comment\' must be set.');
+			if(!isset($_REQUEST['url']) || empty($_REQUEST['url']))
+				return new Response('Attribute \'url\' (STRING) must be set.');
 
-			$response = $gpt->request($_REQUEST['comment']);
+			if(!isset($_REQUEST['title']) || empty($_REQUEST['title']))
+				return new Response('Attribute \'title\' (STRING) must be set.');
+
+			if(!isset($_REQUEST['comment']) || empty($_REQUEST['comment']))
+				return new Response('Attribute \'comment\' (STRING) must be set.');
+
+			try
+			{
+				if(!isset($_REQUEST['contextComments'])) throw new Exception();
+				$contextComments = json_decode($_REQUEST['contextComments'], true);
+				if(!is_array($contextComments)) throw new Exception();
+			}
+			catch(Exception $e)
+			{
+				return new Response('Attribute \'contextComments\' (JSON-ARRAY) must be set.');
+			}
+
+			$response = $gpt->request(
+				strval($_REQUEST['title']),
+				strval($_REQUEST['comment']),
+				$contextComments
+			);
+
+			// TODO: create Google Sheets
+
 			return new Response(json_encode($response), 200);
 		}
 		catch(TransporterException $e)

@@ -6,11 +6,13 @@ use ErrorException;
 class RepoRefereeGPTService extends GPTService
 {
 	
-	public function request(string $messageContents): array
+	public function request(string $title, string $message, array $context): array
 	{
-		if (empty($messageContents))
+		if (empty($message))
 			throw new ErrorException('Message contents cannot be empty.');
-		$prompt = $this->generatePrompt($messageContents);
+		
+		$messageWithContext = $this->generateContext($title, $message, $context);
+		$prompt = $this->generatePrompt($messageWithContext);
 		$response = $this->chatRequest($prompt);
 		$handledResponse = $this->handleResponse($response);
 		$returnArray = $this->buildReturnArray($handledResponse);
@@ -27,7 +29,29 @@ class RepoRefereeGPTService extends GPTService
 		return $resultContent;
 	}
 
-	protected function generatePrompt(string $comment): string
+	private function generateContext(string $title, string $message, array $context): string
+	{
+		$messageWithContext = '';
+
+		// Title
+		if(!empty($title))
+			$messageWithContext .= 'Title: \'\'\'' . $title . '\'\'\'\n';
+
+		// Context
+		if(count($context) > 0)
+		{
+			$messageWithContext .= 'Comments before the TARGET comment:\n';
+			foreach(array_values($context) as $key => $contextComment)
+				$messageWithContext .= '- Comment nr. ' . $key . ': \'\'\'' . $contextComment . '\'\'\'\n\n';
+		}
+
+		// Target comment
+		$messageWithContext .= 'TARGET comment: \'\'\'' . $this->deleteReplies($message) . '\'\'\'\n';
+
+		return $messageWithContext;
+	}
+
+	protected function generatePrompt(string $messageWithContext): string
 	{
 		// Toxicity definition
 		$prompt = TOXICITY_DEFINITIONS::TOXICITY_DEFINITION . '\n' .
@@ -44,10 +68,8 @@ class RepoRefereeGPTService extends GPTService
 		$prompt .= '\n';
 
 		// Comment
-		$commentWithoutReplies = $this->deleteReplies($comment);
-		$prompt .= 'Based on the provided toxicity definition analyze the text and decide whether this TARGET text is toxic: ' .
-			'\'\'\'' . $commentWithoutReplies . '\'\'\'' .
-			'\n\n';
+		$prompt .= 'Based on the provided toxicity definition and context analyze the text and decide whether this TARGET text is toxic:\n' .
+			$messageWithContext . '\n\n';
 
 		# GUIDELINES
 		$prompt .= 'Additionally, these are Community Participation Guidelines:\n' .

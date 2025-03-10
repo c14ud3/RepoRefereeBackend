@@ -82,6 +82,6 @@ abstract class GPTService
 		return $result->choices[0]->message->content;
 	}
 
-	abstract protected function generatePrompt(string $comment): string;
+	abstract protected function generatePrompt(string $messageWithContext): string;
 	abstract protected function handleResponse(string $response): array;
 }
