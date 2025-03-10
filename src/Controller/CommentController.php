@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Service\RepoRefereeGPTService;
 use OpenAI\Exceptions\TransporterException;
 use Exception;
+use App\Service\GoogleSheetsService;
 
 final class CommentController extends AbstractController
 {
@@ -46,7 +47,25 @@ final class CommentController extends AbstractController
 				$contextComments
 			);
 
-			// TODO: create Google Sheets
+			// Save to Google Sheets
+			if($response['TEXT_TOXICITY'] ?? false)
+			{
+				try
+				{
+					$googleSheetsService = new GoogleSheetsService();
+					$googleSheetsService->newRow([
+						$_REQUEST['url'] ?? '',
+						$_REQUEST['comment'] ?? '',
+						$response['TOXICITY_REASONS'] ?? '',
+						$response['VIOLATED_GUIDELINE'] ?? '',
+						implode('; ', ($response['REPHRASED_TEXT_OPTIONS'] ?? [])),
+					]);
+				}
+				catch(Exception $e)
+				{
+					return new Response('Error with Google Sheets API: ' . $e->getMessage(), 500);
+				}
+			}
 
 			return new Response(json_encode($response), 200);
 		}
