@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\AuthService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -11,9 +12,12 @@ use Exception;
 
 final class CommentController extends AbstractController
 {
-    #[Route('/comment', name: 'comment')]
-    public function comment(RepoRefereeGPTService $gpt): Response
+    #[Route('/comment/{auth}', name: 'comment')]
+    public function comment(RepoRefereeGPTService $gpt, $auth): Response
     {
+		if (!AuthService::check($auth))
+			return new Response('Unauthorized', 401);
+		
 		try
 		{
 			if(!isset($_REQUEST['comment']))
@@ -26,7 +30,7 @@ final class CommentController extends AbstractController
 		{
 			// check for Timeout
 			if (str_contains($e->getMessage(), 'cURL error 28'))
-				return new Response('The connection to ChatGPT timed out.', 408);
+				return new Response('The request to ChatGPT took too long.', 408);
 			return new Response($e->getMessage(), 500);
 		}
 		catch(Exception $e)
