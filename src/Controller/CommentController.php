@@ -58,7 +58,7 @@ final class CommentController extends AbstractController
 						$_REQUEST['comment'] ?? '',
 						$response['TOXICITY_REASONS'] ?? '',
 						$response['VIOLATED_GUIDELINE'] ?? '',
-						implode('; ', ($response['REPHRASED_TEXT_OPTIONS'] ?? [])),
+						implode(PHP_EOL, ($response['REPHRASED_TEXT_OPTIONS'] ?? [])),
 					]);
 				}
 				catch(Exception $e)

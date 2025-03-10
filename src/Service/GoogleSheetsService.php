@@ -30,13 +30,11 @@ class GoogleSheetsService
 		// load env
 		$env = new ENVService();
 		$env->loadEnv();
+		
 		$spreadsheetId = $_ENV['GOOGLE_SPREADSHEET_ID'];
-
+		$range = $_ENV['GOOGLE_SPREADSHEET_NAME']; // the service will detect the last row of this sheet
 		$valueRange = new \Google_Service_Sheets_ValueRange();
 		$valueRange->setValues([$data]);
-
-		$range = $_ENV['GOOGLE_SPREADSHEET_NAME']; // the service will detect the last row of this sheet
-
 		$options = ['valueInputOption' => 'USER_ENTERED'];
 		
 		$this->service->spreadsheets_values->append($spreadsheetId, $range, $valueRange, $options);
