@@ -3,31 +3,37 @@
 ## Request
 
 ```
-GET https://{YOUR-DOMAIN}/comment/{AUTH-TOKEN}
+POST https://{YOUR-DOMAIN}/comment/{AUTH-TOKEN}
 ```
 
-The following attributes hereby have to be transmitted:
+The following attributes have to be transmitted in the body of the request with content-type JSON:
 
 | Attribute         | Expected content                                             |
 | ---------------   | ------------------------------------------------------------ |
 | `url`             | (STRING) URL to the comment (used for link in Google Sheets) |
 | `title`           | (STRING) Title of the conversation/bug                       |
 | `comment`         | (STRING) Comment to be checked                               |
-| `contextComments` | (JSON-STRING: array with strings) Previous comments            |
+| `contextComments` | (ARRAY with strings) Previous comments            |
 
 ### Example request
 ```Python
 import requests, json
 
-res = requests.get('https://{YOUR-DOMAIN}/comment/{AUTH-TOKEN}', {
-	"url": "https://bugzilla.mozilla.org/show_bug.cgi?id={XXX}",
-	"title": "Test",
-	"contextComments": json.dumps([
-		"Hello, this is a test.",
-		"Hey there, that's a test too :)"
-	]),
-	"comment": "This is a very very rude test comment!!!"
-})
+res = requests.post(
+	'https://{YOUR-DOMAIN}/comment/{AUTH-TOKEN}',
+	data=json.dumps({
+		"url": "https://bugzilla.mozilla.org/show_bug.cgi?id={XXX}",
+		"title": "Test",
+		"contextComments": [
+			"Hello, this is a test.",
+			"Hey there, that's a test too :)"
+		],
+		"comment": "This is a very very rude test comment!!!"
+	}),
+	headers={
+		'Content-Type': 'application/json'
+	}
+)
 ```
 
 ## Response

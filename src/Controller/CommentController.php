@@ -28,41 +28,37 @@ final class CommentController extends AbstractController
 
 		try
 		{
+			// * Load request data
+			$REQUESTDATA = json_decode(file_get_contents('php://input') ?? '{}', true) ?? [];
+
 			// * Check for required attributes
-			if(!isset($_REQUEST['url']) || empty($_REQUEST['url']))
+			if(!isset($REQUESTDATA['url']) || empty($REQUESTDATA['url']))
 				return new Response('Attribute \'url\' (STRING) must be set.');
 
-			if(!isset($_REQUEST['title']) || empty($_REQUEST['title']))
+			if(!isset($REQUESTDATA['title']) || empty($REQUESTDATA['title']))
 				return new Response('Attribute \'title\' (STRING) must be set.');
 
-			if(!isset($_REQUEST['comment']) || empty($_REQUEST['comment']))
+			if(!isset($REQUESTDATA['comment']) || empty($REQUESTDATA['comment']))
 				return new Response('Attribute \'comment\' (STRING) must be set.');
 
-			try
-			{
-				if(!isset($_REQUEST['contextComments'])) throw new Exception();
-				$contextComments = json_decode($_REQUEST['contextComments'], true);
-				if(!is_array($contextComments)) throw new Exception();
-			}
-			catch(Exception $e)
-			{
-				return new Response('Attribute \'contextComments\' (JSON-ARRAY) must be set.');
-			}
+			if(!isset($REQUESTDATA['contextComments']) || !is_array($REQUESTDATA['contextComments']) ||
+				empty($REQUESTDATA['contextComments']))
+				return new Response('Attribute \'contextComments\' (ARRAY) must be set.');
 
 			// * Request to ChatGPT
 			$response = $gpt->request(
-				strval($_REQUEST['title']),
-				strval($_REQUEST['comment']),
-				$contextComments
+				strval($REQUESTDATA['title']),
+				strval($REQUESTDATA['comment']),
+				$REQUESTDATA['contextComments']
 			);
 
 			// * Log the request
 			$commentLog = new CommentLogService();
 			$commentLog->log(
 				$em,
-				$_REQUEST['url'] ?? '',
-				$_REQUEST['title'] ?? '',
-				$_REQUEST['comment'] ?? '',
+				$REQUESTDATA['url'] ?? '',
+				$REQUESTDATA['title'] ?? '',
+				$REQUESTDATA['comment'] ?? '',
 				$contextComments ?? [],
 				$response['TEXT_TOXICITY'] ?? false,
 				$response['TOXICITY_REASONS'] ?? '',
@@ -77,8 +73,8 @@ final class CommentController extends AbstractController
 				{
 					$googleSheetsService = new GoogleSheetsService();
 					$googleSheetsService->newRow([
-						$_REQUEST['url'] ?? '',
-						$_REQUEST['comment'] ?? '',
+						$REQUESTDATA['url'] ?? '',
+						$REQUESTDATA['comment'] ?? '',
 						$response['TOXICITY_REASONS'] ?? '',
 						$response['VIOLATED_GUIDELINE'] ?? '',
 						implode(PHP_EOL, ($response['REPHRASED_TEXT_OPTIONS'] ?? [])),
