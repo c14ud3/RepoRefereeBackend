@@ -21,19 +21,19 @@ final class CommentController extends AbstractController
 
 		try
 		{
-			if(!isset($_REQUEST['url']) || empty($_REQUEST['url']))
+			if(!isset($_POST['url']) || empty($_POST['url']))
 				return new Response('Attribute \'url\' (STRING) must be set.');
 
-			if(!isset($_REQUEST['title']) || empty($_REQUEST['title']))
+			if(!isset($_POST['title']) || empty($_POST['title']))
 				return new Response('Attribute \'title\' (STRING) must be set.');
 
-			if(!isset($_REQUEST['comment']) || empty($_REQUEST['comment']))
+			if(!isset($_POST['comment']) || empty($_POST['comment']))
 				return new Response('Attribute \'comment\' (STRING) must be set.');
 
 			try
 			{
-				if(!isset($_REQUEST['contextComments'])) throw new Exception();
-				$contextComments = json_decode($_REQUEST['contextComments'], true);
+				if(!isset($_POST['contextComments'])) throw new Exception();
+				$contextComments = json_decode($_POST['contextComments'], true);
 				if(!is_array($contextComments)) throw new Exception();
 			}
 			catch(Exception $e)
@@ -42,8 +42,8 @@ final class CommentController extends AbstractController
 			}
 
 			$response = $gpt->request(
-				strval($_REQUEST['title']),
-				strval($_REQUEST['comment']),
+				strval($_POST['title']),
+				strval($_POST['comment']),
 				$contextComments
 			);
 
@@ -54,8 +54,8 @@ final class CommentController extends AbstractController
 				{
 					$googleSheetsService = new GoogleSheetsService();
 					$googleSheetsService->newRow([
-						$_REQUEST['url'] ?? '',
-						$_REQUEST['comment'] ?? '',
+						$_POST['url'] ?? '',
+						$_POST['comment'] ?? '',
 						$response['TOXICITY_REASONS'] ?? '',
 						$response['VIOLATED_GUIDELINE'] ?? '',
 						implode(PHP_EOL, ($response['REPHRASED_TEXT_OPTIONS'] ?? [])),
