@@ -3,24 +3,32 @@
 namespace App\Controller;
 
 use App\Service\AuthService;
+use App\Service\CommentLogService;
+use App\Service\GoogleSheetsService;
+use App\Service\RepoRefereeGPTService;
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use OpenAI\Exceptions\TransporterException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Service\RepoRefereeGPTService;
-use OpenAI\Exceptions\TransporterException;
-use Exception;
-use App\Service\GoogleSheetsService;
 
 final class CommentController extends AbstractController
 {
     #[Route('/comment/{auth}', name: 'comment')]
-    public function comment(RepoRefereeGPTService $gpt, $auth): Response
+    public function comment(
+		RepoRefereeGPTService $gpt,
+		EntityManagerInterface $em,
+		$auth
+	): Response
     {
+		// * Check authentication
 		if (!AuthService::check($auth))
 			return new Response('Unauthorized', 401);
 
 		try
 		{
+			// * Check for required attributes
 			if(!isset($_POST['url']) || empty($_POST['url']))
 				return new Response('Attribute \'url\' (STRING) must be set.');
 
@@ -41,13 +49,28 @@ final class CommentController extends AbstractController
 				return new Response('Attribute \'contextComments\' (JSON-ARRAY) must be set.');
 			}
 
+			// * Request to ChatGPT
 			$response = $gpt->request(
 				strval($_POST['title']),
 				strval($_POST['comment']),
 				$contextComments
 			);
 
-			// Save to Google Sheets
+			// * Log the request
+			$commentLog = new CommentLogService();
+			$commentLog->log(
+				$em,
+				$_POST['url'] ?? '',
+				$_POST['title'] ?? '',
+				$_POST['comment'] ?? '',
+				$contextComments ?? [],
+				$response['TEXT_TOXICITY'] ?? false,
+				$response['TOXICITY_REASONS'] ?? '',
+				$response['VIOLATED_GUIDELINE'] ?? '',
+				$response['REPHRASED_TEXT_OPTIONS'] ?? []
+			);
+
+			// * If toxic: add Comment & Response to Google Sheets
 			if($response['TEXT_TOXICITY'] ?? false)
 			{
 				try
