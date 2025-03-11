@@ -29,19 +29,19 @@ final class CommentController extends AbstractController
 		try
 		{
 			// * Check for required attributes
-			if(!isset($_POST['url']) || empty($_POST['url']))
+			if(!isset($_REQUEST['url']) || empty($_REQUEST['url']))
 				return new Response('Attribute \'url\' (STRING) must be set.');
 
-			if(!isset($_POST['title']) || empty($_POST['title']))
+			if(!isset($_REQUEST['title']) || empty($_REQUEST['title']))
 				return new Response('Attribute \'title\' (STRING) must be set.');
 
-			if(!isset($_POST['comment']) || empty($_POST['comment']))
+			if(!isset($_REQUEST['comment']) || empty($_REQUEST['comment']))
 				return new Response('Attribute \'comment\' (STRING) must be set.');
 
 			try
 			{
-				if(!isset($_POST['contextComments'])) throw new Exception();
-				$contextComments = json_decode($_POST['contextComments'], true);
+				if(!isset($_REQUEST['contextComments'])) throw new Exception();
+				$contextComments = json_decode($_REQUEST['contextComments'], true);
 				if(!is_array($contextComments)) throw new Exception();
 			}
 			catch(Exception $e)
@@ -51,8 +51,8 @@ final class CommentController extends AbstractController
 
 			// * Request to ChatGPT
 			$response = $gpt->request(
-				strval($_POST['title']),
-				strval($_POST['comment']),
+				strval($_REQUEST['title']),
+				strval($_REQUEST['comment']),
 				$contextComments
 			);
 
@@ -60,9 +60,9 @@ final class CommentController extends AbstractController
 			$commentLog = new CommentLogService();
 			$commentLog->log(
 				$em,
-				$_POST['url'] ?? '',
-				$_POST['title'] ?? '',
-				$_POST['comment'] ?? '',
+				$_REQUEST['url'] ?? '',
+				$_REQUEST['title'] ?? '',
+				$_REQUEST['comment'] ?? '',
 				$contextComments ?? [],
 				$response['TEXT_TOXICITY'] ?? false,
 				$response['TOXICITY_REASONS'] ?? '',
@@ -77,8 +77,8 @@ final class CommentController extends AbstractController
 				{
 					$googleSheetsService = new GoogleSheetsService();
 					$googleSheetsService->newRow([
-						$_POST['url'] ?? '',
-						$_POST['comment'] ?? '',
+						$_REQUEST['url'] ?? '',
+						$_REQUEST['comment'] ?? '',
 						$response['TOXICITY_REASONS'] ?? '',
 						$response['VIOLATED_GUIDELINE'] ?? '',
 						implode(PHP_EOL, ($response['REPHRASED_TEXT_OPTIONS'] ?? [])),

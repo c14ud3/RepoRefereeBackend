@@ -3,7 +3,7 @@
 ## Request
 
 ```
-POST https://{YOUR-DOMAIN}/comment/{AUTH-TOKEN}
+GET https://{YOUR-DOMAIN}/comment/{AUTH-TOKEN}
 ```
 
 The following attributes hereby have to be transmitted:
@@ -19,7 +19,7 @@ The following attributes hereby have to be transmitted:
 ```Python
 import requests, json
 
-res = requests.post('https://{YOUR-DOMAIN}/comment/{AUTH-TOKEN}', {
+res = requests.get('https://{YOUR-DOMAIN}/comment/{AUTH-TOKEN}', {
 	"url": "https://bugzilla.mozilla.org/show_bug.cgi?id={XXX}",
 	"title": "Test",
 	"contextComments": json.dumps([
