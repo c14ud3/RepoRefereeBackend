@@ -28,6 +28,7 @@ class CommentLogService
 		$commentLog->setToxicityReasons($toxicityReasons);
 		$commentLog->setViolatedGuideline($violatedGuideline);
 		$commentLog->setRephrasedTextOptions(json_encode($rephrasedTextOptions));
+		$commentLog->setTimestamp(new \DateTime('now', new \DateTimeZone('Europe/Zurich')));
 
 		$entityManager->persist($commentLog);
 		$entityManager->flush();

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CommentsLogRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommentsLogRepository::class)]
@@ -36,6 +37,9 @@ class CommentsLog
 
     #[ORM\Column(length: 1000000)]
     private ?string $rephrased_text_options = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $timestamp = null;
 
     public function getId(): ?int
     {
@@ -134,6 +138,18 @@ class CommentsLog
     public function setRephrasedTextOptions(string $rephrased_text_options): static
     {
         $this->rephrased_text_options = $rephrased_text_options;
+
+        return $this;
+    }
+
+    public function getTimestamp(): ?\DateTimeInterface
+    {
+        return $this->timestamp;
+    }
+
+    public function setTimestamp(\DateTimeInterface $timestamp): static
+    {
+        $this->timestamp = $timestamp;
 
         return $this;
     }
