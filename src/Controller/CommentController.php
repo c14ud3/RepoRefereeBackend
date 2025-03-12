@@ -34,17 +34,17 @@ final class CommentController extends AbstractController
 
 			// * Check for required attributes
 			if(!isset($REQUESTDATA['url']) || empty($REQUESTDATA['url']))
-				return new Response('Attribute \'url\' (STRING) must be set.');
+				return new Response('Attribute \'url\' (STRING) must be set.', 400);
 
 			if(!isset($REQUESTDATA['title']) || empty($REQUESTDATA['title']))
-				return new Response('Attribute \'title\' (STRING) must be set.');
+				return new Response('Attribute \'title\' (STRING) must be set.', 400);
 
 			if(!isset($REQUESTDATA['comment']) || empty($REQUESTDATA['comment']))
-				return new Response('Attribute \'comment\' (STRING) must be set.');
+				return new Response('Attribute \'comment\' (STRING) must be set.', 400);
 
 			if(!isset($REQUESTDATA['contextComments']) || !is_array($REQUESTDATA['contextComments']) ||
 				empty($REQUESTDATA['contextComments']))
-				return new Response('Attribute \'contextComments\' (ARRAY) must be set.');
+				return new Response('Attribute \'contextComments\' (ARRAY) must be set.', 400);
 
 			// * Request to ChatGPT
 			$response = $gpt->request(
@@ -84,11 +84,11 @@ final class CommentController extends AbstractController
 				}
 				catch(Exception $e)
 				{
-					return new Response('Error with Google Sheets API: ' . $e->getMessage(), 500);
+					return new Response('Error with Google Sheets API: ' . $e->getMessage(), 502);
 				}
 			}
 
-			return new Response(json_encode($response), 200);
+			return new Response(json_encode($response));
 		}
 		catch(TransporterException $e)
 		{
