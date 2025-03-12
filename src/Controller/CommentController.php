@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Model\CommentsLogSource;
 use App\Service\AuthService;
 use App\Service\CommentLogService;
 use App\Service\GoogleSheetsService;
@@ -63,7 +64,8 @@ final class CommentController extends AbstractController
 				$response['TEXT_TOXICITY'] ?? false,
 				$response['TOXICITY_REASONS'] ?? '',
 				$response['VIOLATED_GUIDELINE'] ?? '',
-				$response['REPHRASED_TEXT_OPTIONS'] ?? []
+				$response['REPHRASED_TEXT_OPTIONS'] ?? [],
+				CommentsLogSource::BUGZILLA
 			);
 
 			// * If toxic: add Comment & Response to Google Sheets

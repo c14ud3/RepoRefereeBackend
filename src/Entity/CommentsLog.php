@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Model\CommentsLogSource;
 use App\Repository\CommentsLogRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -40,6 +41,9 @@ class CommentsLog
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $timestamp = null;
+
+    #[ORM\Column(enumType: CommentsLogSource::class)]
+    private ?CommentsLogSource $source = null;
 
     public function getId(): ?int
     {
@@ -150,6 +154,18 @@ class CommentsLog
     public function setTimestamp(\DateTimeInterface $timestamp): static
     {
         $this->timestamp = $timestamp;
+
+        return $this;
+    }
+
+    public function getSource(): ?CommentsLogSource
+    {
+        return $this->source;
+    }
+
+    public function setSource(CommentsLogSource $source): static
+    {
+        $this->source = $source;
 
         return $this;
     }

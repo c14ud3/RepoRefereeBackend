@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\CommentsLog;
+use App\Model\CommentsLogSource;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CommentLogService
@@ -16,7 +17,8 @@ class CommentLogService
 		bool $toxic,
 		string $toxicityReasons,
 		string $violatedGuideline,
-		array $rephrasedTextOptions
+		array $rephrasedTextOptions,
+		CommentsLogSource $source
 	): void
 	{
 		$commentLog = new CommentsLog();
@@ -29,6 +31,7 @@ class CommentLogService
 		$commentLog->setViolatedGuideline($violatedGuideline);
 		$commentLog->setRephrasedTextOptions(json_encode($rephrasedTextOptions));
 		$commentLog->setTimestamp(new \DateTime('now', new \DateTimeZone('Europe/Zurich')));
+		$commentLog->setSource($source);
 
 		$entityManager->persist($commentLog);
 		$entityManager->flush();
