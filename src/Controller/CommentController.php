@@ -24,7 +24,7 @@ final class CommentController extends AbstractController
 	): Response
     {
 		// * Check authentication
-		if (!AuthService::check($auth))
+		if (!AuthService::checker($auth))
 			return new Response('Unauthorized', 401);
 
 		try
