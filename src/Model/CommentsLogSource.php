@@ -4,6 +4,6 @@ namespace App\Model;
 
 enum CommentsLogSource: string
 {
-	case BUGZILLA = 'bugzilla';
-	case GITHUB = 'github';
+	case BUGZILLA = 'BZ';
+	case GITHUB = 'GH';
 }
