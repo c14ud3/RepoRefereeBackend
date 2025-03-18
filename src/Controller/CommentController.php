@@ -42,8 +42,7 @@ final class CommentController extends AbstractController
 			if(!isset($REQUESTDATA['comment']) || empty($REQUESTDATA['comment']))
 				return new Response('Attribute \'comment\' (STRING) must be set.', 400);
 
-			if(!isset($REQUESTDATA['contextComments']) || !is_array($REQUESTDATA['contextComments']) ||
-				empty($REQUESTDATA['contextComments']))
+			if(!isset($REQUESTDATA['contextComments']) || !is_array($REQUESTDATA['contextComments']))
 				return new Response('Attribute \'contextComments\' (ARRAY) must be set.', 400);
 
 			// * Request to ChatGPT
