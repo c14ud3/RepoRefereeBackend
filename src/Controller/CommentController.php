@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\CommentsLog;
 use App\Model\CommentsLogSource;
 use App\Service\AuthService;
 use App\Service\CommentLogService;
@@ -45,6 +46,20 @@ final class CommentController extends AbstractController
 			if(!isset($REQUESTDATA['contextComments']) || !is_array($REQUESTDATA['contextComments']))
 				return new Response('Attribute \'contextComments\' (ARRAY) must be set.', 400);
 
+			// * If the comment has already been processed earlier, return the previous values
+			$previousCommentData = $em->getRepository(CommentsLog::class)->findBy([
+				'url' => $REQUESTDATA['url'],
+				'comment' => $REQUESTDATA['comment'],
+			]);
+
+			if(count($previousCommentData) > 0)
+				return new Response(json_encode([
+					'TEXT_TOXICITY' => $previousCommentData[0]->isToxic(),
+					'TOXICITY_REASONS' => $previousCommentData[0]->getToxicityReasons(),
+					'VIOLATED_GUIDELINE' => $previousCommentData[0]->getViolatedGuideline(),
+					'REPHRASED_TEXT_OPTIONS' => json_decode($previousCommentData[0]->getRephrasedTextOptions()),
+				]));
+			
 			// * Request to ChatGPT
 			$response = $gpt->request(
 				strval($REQUESTDATA['title']),

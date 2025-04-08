@@ -51,6 +51,7 @@ If everything fine:
 }
 ```
 Additionally: A new line gets created in Google Docs for moderators.
+If the same request has already been sent before (meaning `url` and `comment` are equal), the response is the same as above, but no extra line gets created within the Google Sheets.
 ## Exceptions
 - If the request to ChatGPT took more than 20s: `Error 408`
 - If `AUTH-TOKEN` wrong: `Eror 401`
