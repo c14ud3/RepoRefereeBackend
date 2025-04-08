@@ -74,7 +74,7 @@ class RepoRefereeGPTService extends GPTService
 		# GUIDELINES
 		$prompt .= 'Additionally, these are Community Participation Guidelines:\n' .
 			'\'\'\'' . TOXICITY_DEFINITIONS::GUIDELINES . '\'\'\'\n\n';
-		$prompt .= 'If the comment is toxic, explain why the text is considered toxic, referencing the specific sub-concept definition, indicate which specific guideline from the Community Participation Guidelines was violated and provide three rephrased versions of the text that maintain the original intent but without the toxicity.\n';
+		$prompt .= 'If the comment is toxic, explain why the text is considered toxic, referencing the specific sub-concept definition, indicate which specific guideline from the Community Participation Guidelines was violated and provide three rephrased versions of the text that maintain the original intent but without toxicity or any negative tone. Try to make the rephrased versions as nice and firendly as possible.\n';
 
 		# ANSWER FORMAT
 		$prompt .= 'Structure your answer in the following JSON format:\n';
