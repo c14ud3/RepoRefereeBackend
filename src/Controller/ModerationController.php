@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Moderation;
 use App\Model\Satisfaction;
 use App\Service\AuthService;
+use App\Service\ModerationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -64,7 +65,7 @@ final class ModerationController extends AbstractController
 				'accepted' => $moderation->isAccepted(),
 				'title' => $moderation->getComment()->getTitle(),
 				'url' => $moderation->getComment()->getUrl(),
-				'timestamp' => $moderation->getTimestamp()->format('Y-m-d H:i:s'),
+				'timestamp' => $moderation->getTimestamp()->format('d.m.y H:i'),
 			];
 		}
 
@@ -106,6 +107,15 @@ final class ModerationController extends AbstractController
 				'violatedGuideline' => $comment->getViolatedGuideline(),
 				'rephrasedTextOptions' => json_decode($comment->getRephrasedTextOptions()),
 			];
+
+			$strings_to_reply = [];
+			foreach(json_decode($comment->getRephrasedTextOptions()) as $rephrased_text_option) {
+				$strings_to_reply[] = ModerationService::buildResponseText(
+					$comment->getToxicityReasons(),
+					$comment->getViolatedGuideline(),
+					$rephrased_text_option
+				);
+			}
 		}
 		
 		return $this->render('moderation/detail.html.twig', [
@@ -113,6 +123,7 @@ final class ModerationController extends AbstractController
 			'comment_found' => $moderation != null,
 			'moderation' => $return_moderation,
 			'comment' => $return_comment,
+			'strings_to_reply' => $strings_to_reply,
         ]);
     }
 

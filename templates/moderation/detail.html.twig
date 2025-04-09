@@ -18,6 +18,12 @@
 				<input type="text" class="form-control" id="title" value="{{ comment.title }}" disabled>
 			</div>
 
+			{# Toxicity Explanation #}
+			<div class="form-group">
+				<label for="toxicityExplanation">Toxicity Explanation</label>
+				<textarea class="form-control" id="toxicityExplanation" rows="2" disabled>{{ comment.toxicityReasons }}</textarea>
+			</div>
+
 			{# Comment #}
 			<div class="form-group">
 				<label for="comment">Comment</label>
@@ -32,12 +38,6 @@
 				</p>
 			</div>
 
-			{# Toxicity Explanation #}
-			<div class="form-group">
-				<label for="toxicityExplanation">Toxicity Explanation</label>
-				<textarea class="form-control" id="toxicityExplanation" rows="2" disabled>{{ comment.toxicityReasons }}</textarea>
-			</div>
-
 			{# Guidelines Reference #}
 			<div class="form-group">
 				<label for="guidelinesReference">Guidelines Reference</label>
@@ -47,12 +47,27 @@
 			{# Rephrasing Options #}
 			<div class="form-group">
 				<label>Rephrasing Options</label>
-				<textarea class="form-control mb-1" id="rephrasingOption0" rows="2" disabled>{{ comment.rephrasedTextOptions[0] }}</textarea>
-				<textarea class="form-control mb-1" id="rephrasingOption1" rows="2" disabled>{{ comment.rephrasedTextOptions[1] }}</textarea>
-				<textarea class="form-control" id="rephrasingOption2" rows="2" disabled>{{ comment.rephrasedTextOptions[2] }}</textarea>
+				<div class="position-relative mb-1">
+					<textarea class="form-control" id="rephrasingOption0" rows="2" style="padding-right: 50px;" disabled>{{ comment.rephrasedTextOptions[0] }}</textarea>
+					<div class="position-absolute top-0 end-0">
+						<button class="btn btn-sm btn-outline-primary" onclick="copyReply(`{{ strings_to_reply[0] }}`);" type="button">Create</button>
+					</div>
+				</div>
+				<div class="position-relative mb-1">
+					<textarea class="form-control" id="rephrasingOption1" rows="2" style="padding-right: 50px;" disabled>{{ comment.rephrasedTextOptions[1] }}</textarea>
+					<div class="position-absolute top-0 end-0">
+						<button class="btn btn-sm btn-outline-primary" onclick="copyReply(`{{ strings_to_reply[1] }}`);" type="button">Create</button>
+					</div>
+				</div>
+				<div class="position-relative">
+					<textarea class="form-control" id="rephrasingOption2" rows="2" style="padding-right: 50px;" disabled>{{ comment.rephrasedTextOptions[2] }}</textarea>
+					<div class="position-absolute top-0 end-0">
+						<button class="btn btn-sm btn-outline-primary" onclick="copyReply(`{{ strings_to_reply[2] }}`);" type="button">Create</button>
+					</div>
+				</div>
 			</div>
 
-			<h4 class="mt-4">Survey</h4>
+			<h4 class="mt-4">Outcome</h4>
 
 			{# Your Decision #}
 			<div class="form-group">
@@ -86,36 +101,51 @@
 			<div class="form-group">
 				<label for="satisfactionToxicityExplanation">How satisfied are you with the
 					<u>toxicity explanation</u>?</label>
-				<select class="form-select" id="satisfactionToxicityExplanation">
-					<option value="" {% if moderation.satisfactionToxicityExplanation is null %} selected {% endif %}></option>
+				<div class="d-flex">
 					{% for case in enum('App\\Model\\Satisfaction').cases %}
-						<option value="{{ case.value }}" {% if case == moderation.satisfactionToxicityExplanation %} selected {% endif %}>{{ case.name|replace({"_": " "})|lower|capitalize }}</option>
+						<div class="form-check mr-5">
+							<input class="form-check-input" type="radio" name="satisfactionToxicityExplanation"
+								id="satisfactionToxicityExplanation{{ case.value }}" value="{{ case.value }}"
+								{% if moderation.satisfactionToxicityExplanation.value ?? null == case.value %} checked {% endif %}>
+							<label class="form-check-label" for="satisfactionToxicityExplanation{{ case.value }}">
+								{{ case.name|replace({"_": " "})|lower|capitalize }}</label>
+						</div>
 					{% endfor %}
-				</select>
+				</div>
 			</div>
 
 			{# Satisfaction with guidelines reference #}
 			<div class="form-group">
 				<label for="satisfactionGuidelinesReference">How satisfied are you with the
 					<u>guidelines reference</u>?</label>
-				<select class="form-select" id="satisfactionGuidelinesReference">
-					<option value="" {% if moderation.satisfactionGuidelinesReference is null %} selected {% endif %}></option>
+				<div class="d-flex">
 					{% for case in enum('App\\Model\\Satisfaction').cases %}
-						<option value="{{ case.value }}" {% if case == moderation.satisfactionGuidelinesReference %} selected {% endif %}>{{ case.name|replace({"_": " "})|lower|capitalize }}</option>
+						<div class="form-check mr-5">
+							<input class="form-check-input" type="radio" name="satisfactionGuidelinesReference"
+								id="satisfactionGuidelinesReference{{ case.value }}" value="{{ case.value }}"
+								{% if moderation.satisfactionGuidelinesReference.value ?? null == case.value %} checked {% endif %}>
+							<label class="form-check-label" for="satisfactionGuidelinesReference{{ case.value }}">
+								{{ case.name|replace({"_": " "})|lower|capitalize }}</label>
+						</div>
 					{% endfor %}
-				</select>
+				</div>
 			</div>
 
 			{# Satisfaction with rephrasing options #}
 			<div class="form-group">
 				<label for="satisfactionRephrasingOptions">How satisfied are you with the
-					<u>rephrasing options</u>?</label>
-				<select class="form-select" id="satisfactionRephrasingOptions">
-					<option value="" {% if moderation.satisfactionRephrasingOptions is null %} selected {% endif %}></option>
+					<u>guidelines reference</u>?</label>
+				<div class="d-flex">
 					{% for case in enum('App\\Model\\Satisfaction').cases %}
-						<option value="{{ case.value }}" {% if case == moderation.satisfactionRephrasingOptions %} selected {% endif %}>{{ case.name|replace({"_": " "})|lower|capitalize }}</option>
+						<div class="form-check mr-5">
+							<input class="form-check-input" type="radio" name="satisfactionRephrasingOptions"
+								id="satisfactionRephrasingOptions{{ case.value }}" value="{{ case.value }}"
+								{% if moderation.satisfactionRephrasingOptions.value ?? null == case.value %} checked {% endif %}>
+							<label class="form-check-label" for="satisfactionRephrasingOptions{{ case.value }}">
+								{{ case.name|replace({"_": " "})|lower|capitalize }}</label>
+						</div>
 					{% endfor %}
-				</select>
+				</div>
 			</div>
 
 			{# Remarks #}
@@ -216,19 +246,19 @@
 		}
 
 		{# check if satisfactionToxicityExplanation != "" #}
-		if ($("#satisfactionToxicityExplanation").val() === "") {
+		if ($("input[name='satisfactionToxicityExplanation']:checked").length === 0) {
 			alert("Please select a satisfaction level for the toxicity explanation.");
 			return;
 		}
 
 		{# check if satisfactionGuidelinesReference != "" #}
-		if ($("#satisfactionGuidelinesReference").val() === "") {
+		if ($("input[name='satisfactionGuidelinesReference']:checked").length === 0) {
 			alert("Please select a satisfaction level for the guidelines reference.");
 			return;
 		}
 
 		{# check if satisfactionRephrasingOptions != "" #}
-		if ($("#satisfactionRephrasingOptions").val() === "") {
+		if ($("input[name='satisfactionRephrasingOptions']:checked").length === 0) {
 			alert("Please select a satisfaction level for the rephrasing options.");
 			return;
 		}
@@ -239,9 +269,9 @@
 			data: {
 				"accepted": $("input[name='accepted']:checked").val(),
 				"timeUsed": timerTime,
-				"satisfactionToxicityExplanation": $("#satisfactionToxicityExplanation").val(),
-				"satisfactionGuidelinesReference": $("#satisfactionGuidelinesReference").val(),
-				"satisfactionRephrasingOptions": $("#satisfactionRephrasingOptions").val(),
+				"satisfactionToxicityExplanation": $("input[name='satisfactionToxicityExplanation']:checked").val(),
+				"satisfactionGuidelinesReference": $("input[name='satisfactionGuidelinesReference']:checked").val(),
+				"satisfactionRephrasingOptions": $("input[name='satisfactionRephrasingOptions']:checked").val(),
 				"remarks": $("#remarks").val(),
 			},
 			success: () => {
@@ -252,5 +282,16 @@
 				alert("There was an error saving the data.");
 			},
 		});
+	};
+
+	const copyReply = (text) => {
+		navigator.clipboard
+			.writeText(text)
+			.then(() => {
+				alert("Reply copied to clipboard.");
+			})
+			.catch(err => {
+				alert("Failed to copy reply: " + err);
+			});
 	};
 {% endblock %}
