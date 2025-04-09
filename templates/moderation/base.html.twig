@@ -14,8 +14,14 @@
             <div class="container">
                 <a class="navbar-brand" href="#">RepoReferee</a>
 				<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><span class="nav-link text-light">BugZilla</span></li>
-                    </ul>
+                    <li class="nav-item">
+						{% for case in enum('App\\Model\\CommentsLogSource').cases %}
+							{% if case.value|lower == auth|split(":")[0] %}
+								<span class="nav-link text-light">{{ case.name|replace({"_": " "})|lower|capitalize }}</span>
+							{% endif %}
+						{% endfor %}
+					</li>
+                </ul>
             </div>
         </nav>
         <div class="container">
