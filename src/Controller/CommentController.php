@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\CommentsLog;
+use App\Entity\Moderation;
 use App\Model\CommentsLogSource;
 use App\Service\AuthService;
 use App\Service\CommentLogService;
@@ -68,8 +69,8 @@ final class CommentController extends AbstractController
 			);
 
 			// * Log the request
-			$commentLog = new CommentLogService();
-			$commentLog->log(
+			$commentLogService = new CommentLogService();
+			$commentLog = $commentLogService->log(
 				$em,
 				$REQUESTDATA['url'] ?? '',
 				$REQUESTDATA['title'] ?? '',
@@ -82,9 +83,10 @@ final class CommentController extends AbstractController
 				CommentsLogSource::BUGZILLA
 			);
 
-			// * If toxic: add Comment & Response to Google Sheets
+			// * If toxic: add Comment & Response to Google Sheets & Moderation DB
 			if($response['TEXT_TOXICITY'] ?? false)
 			{
+				// Add comment to Google Sheets
 				try
 				{
 					$googleSheetsService = new GoogleSheetsService();
@@ -100,6 +102,15 @@ final class CommentController extends AbstractController
 				{
 					return new Response('Error with Google Sheets API: ' . $e->getMessage(), 502);
 				}
+
+				// Add comment to Moderation DB
+				$moderation = new Moderation();
+				$moderation->setComment($commentLog);
+				$moderation->setTimeUsed(0);
+				$moderation->setRemarks('');
+				$moderation->setTimestamp(new \DateTime('now', new \DateTimeZone('Europe/Zurich')));
+				$em->persist($moderation);
+				$em->flush();
 			}
 
 			return new Response(json_encode($response));
