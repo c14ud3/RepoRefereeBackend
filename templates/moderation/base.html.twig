@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="RepoReferee Moderation" />
+        <meta name="author" content="Claudio Fleischmann" />
+        <title>RepoReferee</title>
+        <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" />
+        <link href="{{ asset('css/styles.css') }}" rel="stylesheet" />
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">RepoReferee</a>
+				<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+						{% for case in enum('App\\Model\\CommentsLogSource').cases %}
+							{% if case.value|lower == auth|split(":")[0] %}
+								<span class="nav-link text-light">{{ case.name|replace({"_": " "})|lower|capitalize }}</span>
+							{% endif %}
+						{% endfor %}
+					</li>
+                </ul>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="mt-5">
+                {% block body %}{% endblock %}
+            </div>
+        </div>
+        <script src="{{ asset('js/jquery.min.js') }}"></script>
+        <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+		<script>{% block javascript %}{% endblock %}</script>
+    </body>
+</html>

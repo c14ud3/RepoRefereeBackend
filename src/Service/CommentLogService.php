@@ -19,7 +19,7 @@ class CommentLogService
 		string $violatedGuideline,
 		array $rephrasedTextOptions,
 		CommentsLogSource $source
-	): void
+	): CommentsLog
 	{
 		$commentLog = new CommentsLog();
 		$commentLog->setUrl($url);
@@ -35,5 +35,7 @@ class CommentLogService
 
 		$entityManager->persist($commentLog);
 		$entityManager->flush();
+
+		return $commentLog;
 	}
 }

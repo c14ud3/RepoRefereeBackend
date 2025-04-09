@@ -1,0 +1,256 @@
+{% extends 'moderation/base.html.twig' %}
+
+{% block body %}
+	{# Back Button #}
+	<a class="btn btn-primary mb-4" href="{{ path('app_moderation_comments', {'auth': auth}) }}" role="button">Back to list</a>
+
+	{# Comment Details #}
+	{% if not comment_found %}
+		<div class="alert alert-danger" role="alert">
+			Comment not found.
+		</div>
+	{% else %}
+		<form class="mb-5">
+
+			{# Title #}
+			<div class="form-group">
+				<label for="title">Title</label>
+				<input type="text" class="form-control" id="title" value="{{ comment.title }}" disabled>
+			</div>
+
+			{# Comment #}
+			<div class="form-group">
+				<label for="comment">Comment</label>
+				<textarea class="form-control" id="comment" rows="5" disabled>{{ comment.comment }}</textarea>
+			</div>
+
+			{# URL #}
+			<div class="form-group">
+				<label for="url">URL</label>
+				<p id="url">
+					<a href="{{ comment.url }}" target="_blank">{{ comment.url }}</a>
+				</p>
+			</div>
+
+			{# Toxicity Explanation #}
+			<div class="form-group">
+				<label for="toxicityExplanation">Toxicity Explanation</label>
+				<textarea class="form-control" id="toxicityExplanation" rows="2" disabled>{{ comment.toxicityReasons }}</textarea>
+			</div>
+
+			{# Guidelines Reference #}
+			<div class="form-group">
+				<label for="guidelinesReference">Guidelines Reference</label>
+				<textarea class="form-control" id="guidelinesReference" rows="2" disabled>{{ comment.violatedGuideline }}</textarea>
+			</div>
+
+			{# Rephrasing Options #}
+			<div class="form-group">
+				<label>Rephrasing Options</label>
+				<textarea class="form-control mb-1" id="rephrasingOption0" rows="2" disabled>{{ comment.rephrasedTextOptions[0] }}</textarea>
+				<textarea class="form-control mb-1" id="rephrasingOption1" rows="2" disabled>{{ comment.rephrasedTextOptions[1] }}</textarea>
+				<textarea class="form-control" id="rephrasingOption2" rows="2" disabled>{{ comment.rephrasedTextOptions[2] }}</textarea>
+			</div>
+
+			<h4 class="mt-4">Survey</h4>
+
+			{# Your Decision #}
+			<div class="form-group">
+				<label>Your Decision</label>
+				<div class="form-check">
+					<input class="form-check-input" type="radio" name="accepted" id="accepted1" value="1" {% if moderation.accepted is same as true %} checked {% endif %}>
+					<label class="form-check-label" for="accepted1">
+						<span class="badge text-bg-success">accept</span>
+					</label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="radio" name="accepted" id="accepted0" value="0" {% if moderation.accepted is same as false %} checked {% endif %}>
+					<label class="form-check-label" for="accepted0">
+						<span class="badge text-bg-danger">reject</span>
+					</label>
+				</div>
+			</div>
+
+			{# Time used to handle this comment #}
+			<div class="form-group">
+				<label>Time used to handle this comment</label>
+				<div class="input-group mb-3">
+					<input type="text" class="form-control" placeholder="HH:MM:SS" onkeyup="updateTimerFromForm();" id="timeUsed">
+					<div class="input-group-append">
+						<button id="timeUsedButton" class="btn btn-success" type="button" onclick="toggleTimer();">Start Timer</button>
+					</div>
+				</div>
+			</div>
+
+			{# Satisfaction with toxicity explanation #}
+			<div class="form-group">
+				<label for="satisfactionToxicityExplanation">How satisfied are you with the
+					<u>toxicity explanation</u>?</label>
+				<select class="form-select" id="satisfactionToxicityExplanation">
+					<option value="" {% if moderation.satisfactionToxicityExplanation is null %} selected {% endif %}></option>
+					{% for case in enum('App\\Model\\Satisfaction').cases %}
+						<option value="{{ case.value }}" {% if case == moderation.satisfactionToxicityExplanation %} selected {% endif %}>{{ case.name|replace({"_": " "})|lower|capitalize }}</option>
+					{% endfor %}
+				</select>
+			</div>
+
+			{# Satisfaction with guidelines reference #}
+			<div class="form-group">
+				<label for="satisfactionGuidelinesReference">How satisfied are you with the
+					<u>guidelines reference</u>?</label>
+				<select class="form-select" id="satisfactionGuidelinesReference">
+					<option value="" {% if moderation.satisfactionGuidelinesReference is null %} selected {% endif %}></option>
+					{% for case in enum('App\\Model\\Satisfaction').cases %}
+						<option value="{{ case.value }}" {% if case == moderation.satisfactionGuidelinesReference %} selected {% endif %}>{{ case.name|replace({"_": " "})|lower|capitalize }}</option>
+					{% endfor %}
+				</select>
+			</div>
+
+			{# Satisfaction with rephrasing options #}
+			<div class="form-group">
+				<label for="satisfactionRephrasingOptions">How satisfied are you with the
+					<u>rephrasing options</u>?</label>
+				<select class="form-select" id="satisfactionRephrasingOptions">
+					<option value="" {% if moderation.satisfactionRephrasingOptions is null %} selected {% endif %}></option>
+					{% for case in enum('App\\Model\\Satisfaction').cases %}
+						<option value="{{ case.value }}" {% if case == moderation.satisfactionRephrasingOptions %} selected {% endif %}>{{ case.name|replace({"_": " "})|lower|capitalize }}</option>
+					{% endfor %}
+				</select>
+			</div>
+
+			{# Remarks #}
+			<div class="form-group">
+				<label for="remarks">Do you have any other remarks?</label>
+				<textarea class="form-control" id="remarks" rows="5">{{ moderation.remarks }}</textarea>
+			</div>
+
+			{# Submit Button #}
+			<div class="form-group mt-4 mb-5">
+				<button type="button" class="btn btn-primary" id="submitButton" onclick="formSubmit();">Submit</button>
+			</div>
+
+		</form>
+	{% endif %}
+{% endblock %}
+
+{# JS #}
+{% block javascript %}
+	var timerIsRunning = false;
+	var timerTime = {{ moderation.timeUsed ?? 0 }};
+		
+	const toggleTimer = () => {
+		if (timerIsRunning) {
+			{# Stop timer #}
+			timerIsRunning = false;
+			$("#timeUsedButton")
+				.removeClass("btn-danger")
+				.addClass("btn-success")
+				.html("Start Timer");
+			$("#timeUsed").attr("disabled", false);
+		} else {
+			{# Start timer #}
+			timerIsRunning = true;
+			$("#timeUsedButton")
+				.removeClass("btn-success")
+				.addClass("btn-danger")
+				.html("Stop Timer");
+			$("#timeUsed").attr("disabled", true);
+		}
+	};
+		
+	const updateTimerInForm = () => {
+		const hours = Math.floor(timerTime / 3600);
+		const minutes = Math.floor((timerTime % 3600) / 60);
+		const seconds = timerTime % 60;
+		const formattedTime = String(hours).padStart(2, '0') + ':' +
+			String(minutes).padStart(2, '0') + ':' +
+			String(seconds).padStart(2, '0');
+		$("#timeUsed").val(formattedTime);
+	};
+	updateTimerInForm();
+		
+	const updateTimerFromForm = () => {
+		const timeString = $("#timeUsed").val();
+		const timeParts = timeString.split(':');
+		if (timeParts.length !== 3) {
+			alert("Invalid time format. Please use HH:MM:SS.");
+		}
+		
+		const hours = parseInt(timeParts[0], 10);
+		const minutes = parseInt(timeParts[1], 10);
+		const seconds = parseInt(timeParts[2], 10);
+		timerTime = (hours * 3600) + (minutes * 60) + seconds;
+	};
+
+	{# Update timer every second #}
+	setInterval(() => {
+		if (timerIsRunning) {
+			timerTime += 1;
+			updateTimerInForm();
+		}
+	}, 1000);
+		
+	$(document).ready(() => {
+		if(confirm("You will later be asked about the time you needed to handle this comment. Do you want to start an automatic timer now?")) {
+			toggleTimer();
+		}
+	});
+	
+	const formSubmit = () => {
+		{# check if Decision set #}
+		if ($("input[name='accepted']:checked").length === 0) {
+			alert("Please select a decision (accept or reject).");
+			return;
+		}
+
+		{# check if timer stopped #}
+		if (timerIsRunning) {
+			alert("Please stop the timer before submitting.");
+			return;
+		}
+
+		{# check if timeUsed != "" #}
+		if ($("#timeUsed").val() === "") {
+			alert("Please enter the time used to handle this comment.");
+			return;
+		}
+
+		{# check if satisfactionToxicityExplanation != "" #}
+		if ($("#satisfactionToxicityExplanation").val() === "") {
+			alert("Please select a satisfaction level for the toxicity explanation.");
+			return;
+		}
+
+		{# check if satisfactionGuidelinesReference != "" #}
+		if ($("#satisfactionGuidelinesReference").val() === "") {
+			alert("Please select a satisfaction level for the guidelines reference.");
+			return;
+		}
+
+		{# check if satisfactionRephrasingOptions != "" #}
+		if ($("#satisfactionRephrasingOptions").val() === "") {
+			alert("Please select a satisfaction level for the rephrasing options.");
+			return;
+		}
+
+		$.ajax({
+			url: "{{ path('api_moderation_comment', {'auth': auth, 'moderation_id': moderation.id}) }}",
+			type: "POST",
+			data: {
+				"accepted": $("input[name='accepted']:checked").val(),
+				"timeUsed": timerTime,
+				"satisfactionToxicityExplanation": $("#satisfactionToxicityExplanation").val(),
+				"satisfactionGuidelinesReference": $("#satisfactionGuidelinesReference").val(),
+				"satisfactionRephrasingOptions": $("#satisfactionRephrasingOptions").val(),
+				"remarks": $("#remarks").val(),
+			},
+			success: () => {
+				alert("Data saved successfully.");
+				window.location.href = "{{ path('app_moderation_comments', {'auth': auth}) }}";
+			},
+			error: () => {
+				alert("There was an error saving the data.");
+			},
+		});
+	};
+{% endblock %}

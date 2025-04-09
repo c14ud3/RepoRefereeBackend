@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Model\CommentsLogSource;
 use App\Repository\CommentsLogRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -44,6 +46,17 @@ class CommentsLog
 
     #[ORM\Column(enumType: CommentsLogSource::class)]
     private ?CommentsLogSource $source = null;
+
+    /**
+     * @var Collection<int, Moderation>
+     */
+    #[ORM\OneToMany(targetEntity: Moderation::class, mappedBy: 'Comment')]
+    private Collection $Moderations;
+
+    public function __construct()
+    {
+        $this->Moderations = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -166,6 +179,36 @@ class CommentsLog
     public function setSource(CommentsLogSource $source): static
     {
         $this->source = $source;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Moderation>
+     */
+    public function getModerations(): Collection
+    {
+        return $this->Moderations;
+    }
+
+    public function addModeration(Moderation $moderation): static
+    {
+        if (!$this->Moderations->contains($moderation)) {
+            $this->Moderations->add($moderation);
+            $moderation->setComment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeModeration(Moderation $moderation): static
+    {
+        if ($this->Moderations->removeElement($moderation)) {
+            // set the owning side to null (unless already changed)
+            if ($moderation->getComment() === $this) {
+                $moderation->setComment(null);
+            }
+        }
 
         return $this;
     }

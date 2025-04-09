@@ -1,0 +1,110 @@
+{% extends 'moderation/base.html.twig' %}
+
+{% block body %}
+	{# Filter #}
+	<div class="d-flex flex-row">
+		<div class="form-floating">
+			<select class="form-select" id="filterSelect">
+				<option value="all">all</option>
+				<option value="open">open</option>
+				<option value="accepted">accepted</option>
+				<option value="rejected">rejected</option>
+			</select>
+			<label for="filterSelect">Filter</label>
+		</div>
+		<div class="form-floating mx-3">
+			<select class="form-select" id="orderSelect">
+				<option value="newest">newest first</option>
+				<option value="">oldest first</option>
+			</select>
+			<label for="orderSelect">Order</label>
+		</div>
+		<div id="loading" class="align-content-center">
+			<img src="{{ asset('img/loader.gif') }}" alt="Loading..." width="25" />
+		</div>
+	</div>
+
+	{# Contents-Box #}
+	<div class="my-4 w-100 border rounded">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th scope="col"></th>
+					<th scope="col">State</th>
+					<th scope="col">Link</th>
+					<th scope="col">Title</th>
+					<th scope="col">Timestamp</th>
+				</tr>
+			</thead>
+			<tbody id="contentTable"></tbody>
+		</table>
+	</div>
+{% endblock %}
+
+{# JS #}
+{% block javascript %}
+	const loadContents = () => {
+		$.ajax({
+			url: "{{ path('api_moderation_comments', {'auth': auth, 'params': '__PARAMS__'}) }}"
+				.replace('__PARAMS__', ($("#filterSelect").val() ?? "all") + '-' + ($("#orderSelect").val() ?? "newest")),
+			type: "GET",
+			beforeSend: () => {
+				$("#loading").show();
+			},
+			success: (data) => {
+				htmlTable = "";
+				JSON.parse(data).forEach((comment) => {
+					var badge = "";
+					if(comment.accepted === true)
+						badge = `<span class="badge badge-pill badge-success">accepted</span>`;
+					else if(comment.accepted === false)
+						badge = `<span class="badge badge-pill badge-danger">rejected</span>`;
+					else
+						badge = `<span class="badge badge-pill badge-secondary">open</span>`;
+
+					var handlingURL = "{{ path('app_moderation_comment', {'auth': auth, 'comment_id': '__COMMENT-ID__'}) }}"
+						.replace('__COMMENT-ID__', comment.id);
+
+					htmlTable += `
+						<tr>
+							<td>
+								<a href="${handlingURL}" class="btn btn-sm btn-outline-primary" role="button">Handle</a>
+							</td>
+							<td>${badge}</td>
+							<td><a href="${comment.url}" target="_blank">here</a></td>
+							<td>${comment.title}</td>
+							<td>${comment.timestamp.slice(0, -3)}</td>
+						</tr>
+					`;
+				});
+				if (htmlTable === "") {
+					htmlTable = `
+						<tr>
+							<td colspan="5" class="text-center p-2">
+								No comments found.
+							</td>
+						</tr>
+					`;
+				}
+				console.log(htmlTable);
+				$("#contentTable").html(htmlTable);
+				$("#loading").hide();
+			},
+			error: (xhr, status, error) => {
+				alert("There was an error loading the comments.");
+				$("#loading").hide();
+			}
+		});
+	};
+
+	$(document).ready(() => {
+		$("#filterSelect").val(sessionStorage.getItem("filterSelect") ?? "all");
+		$("#orderSelect").val(sessionStorage.getItem("orderSelect") ?? "newest");
+	});
+	$(document).ready(() => loadContents());
+	$("#filterSelect, #orderSelect").on("change", () => {
+		sessionStorage.setItem("filterSelect", $("#filterSelect").val());
+		sessionStorage.setItem("orderSelect", $("#orderSelect").val());
+		loadContents()
+	});
+{% endblock %}
