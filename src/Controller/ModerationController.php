@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Moderation;
 use App\Model\Satisfaction;
+use App\Service\AuthService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,7 +28,8 @@ final class ModerationController extends AbstractController
     public function comments($auth): Response
     {
         // * Check authentication
-		// TODO
+		if (!AuthService::moderation($auth))
+			return new Response('Unauthorized', 401);
 		
         return $this->render('moderation/comments.html.twig', [
 			'auth' => $auth,
@@ -38,7 +40,8 @@ final class ModerationController extends AbstractController
     public function commentsApi(EntityManagerInterface $em, $auth, $params): Response
     {
 		// * Check authentication
-		// TODO
+		if (!AuthService::moderation($auth))
+			return new Response('Unauthorized', 401);
 		
         // separate params
 		list($param_filter, $param_order) = explode('-', $params);
@@ -72,7 +75,8 @@ final class ModerationController extends AbstractController
     public function comment(EntityManagerInterface $em, $auth, $comment_id): Response
     {
 		// * Check authentication
-		// TODO
+		if (!AuthService::moderation($auth))
+			return new Response('Unauthorized', 401);
 
         $moderation = $em->getRepository(Moderation::class)->find($comment_id);
 
@@ -116,7 +120,8 @@ final class ModerationController extends AbstractController
     public function commentApi(EntityManagerInterface $em, $auth, $moderation_id): Response
     {
 		// * Check authentication
-		// TODO
+		if (!AuthService::moderation($auth))
+			return new Response('Unauthorized', 401);
 
         $moderation = $em->getRepository(Moderation::class)->find($moderation_id);
 

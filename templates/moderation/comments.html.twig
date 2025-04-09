@@ -46,7 +46,7 @@
 	const loadContents = () => {
 		$.ajax({
 			url: "{{ path('api_moderation_comments', {'auth': auth, 'params': '__PARAMS__'}) }}"
-				.replace('__PARAMS__', ($("#filterSelect").val() ?? "open") + '-' + ($("#orderSelect").val() ?? "newest")),
+				.replace('__PARAMS__', ($("#filterSelect").val() ?? "all") + '-' + ($("#orderSelect").val() ?? "newest")),
 			type: "GET",
 			beforeSend: () => {
 				$("#loading").show();
@@ -98,7 +98,7 @@
 	};
 
 	$(document).ready(() => {
-		$("#filterSelect").val(sessionStorage.getItem("filterSelect") ?? "open");
+		$("#filterSelect").val(sessionStorage.getItem("filterSelect") ?? "all");
 		$("#orderSelect").val(sessionStorage.getItem("orderSelect") ?? "newest");
 	});
 	$(document).ready(() => loadContents());

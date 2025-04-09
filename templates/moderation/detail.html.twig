@@ -244,8 +244,9 @@
 				"satisfactionRephrasingOptions": $("#satisfactionRephrasingOptions").val(),
 				"remarks": $("#remarks").val(),
 			},
-			success: (data) => {
-				console.log(data);
+			success: () => {
+				alert("Data saved successfully.");
+				window.location.href = "{{ path('app_moderation_comments', {'auth': auth}) }}";
 			},
 			error: () => {
 				alert("There was an error saving the data.");
