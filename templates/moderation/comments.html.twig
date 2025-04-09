@@ -56,9 +56,9 @@
 				JSON.parse(data).forEach((comment) => {
 					var badge = "";
 					if(comment.accepted === true)
-						badge = `<span class="badge badge-pill badge-success">accepted</span>`;
+						badge = `<span class="badge badge-pill badge-success">reacted</span>`;
 					else if(comment.accepted === false)
-						badge = `<span class="badge badge-pill badge-danger">rejected</span>`;
+						badge = `<span class="badge badge-pill badge-danger">no reaction<br>needed</span>`;
 					else
 						badge = `<span class="badge badge-pill badge-secondary">open</span>`;
 
