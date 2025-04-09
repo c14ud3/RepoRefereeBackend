@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Moderation;
+use App\Model\Satisfaction;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +26,9 @@ final class ModerationController extends AbstractController
 	#[Route('/moderation/{auth}/comments', name: 'app_moderation_comments')]
     public function comments($auth): Response
     {
+        // * Check authentication
+		// TODO
+		
         return $this->render('moderation/comments.html.twig', [
 			'auth' => $auth,
         ]);
@@ -33,7 +37,10 @@ final class ModerationController extends AbstractController
 	#[Route('/moderation/{auth}/api/comments/{params}', name: 'api_moderation_comments')]
     public function commentsApi(EntityManagerInterface $em, $auth, $params): Response
     {
-		// separate params
+		// * Check authentication
+		// TODO
+		
+        // separate params
 		list($param_filter, $param_order) = explode('-', $params);
 
 		$criteria = [];
@@ -62,10 +69,67 @@ final class ModerationController extends AbstractController
     }
 
 	#[Route('/moderation/{auth}/comment/{comment_id}', name: 'app_moderation_comment')]
-    public function comment($auth, $comment_id): Response
+    public function comment(EntityManagerInterface $em, $auth, $comment_id): Response
     {
-        return $this->render('moderation/detail.html.twig', [
+		// * Check authentication
+		// TODO
+
+        $moderation = $em->getRepository(Moderation::class)->find($comment_id);
+
+		$return_moderation = [];
+		$return_comment = [];
+
+		if ($moderation != null) {
+			$comment = $moderation->getComment();
+
+			$return_moderation = [
+				'id' => $moderation->getId(),
+				'accepted' => $moderation->isAccepted(),
+				'timeUsed' => $moderation->getTimeUsed(),
+				'satisfactionToxicityExplanation' => $moderation->getSatisfactionToxicityExplanation(),
+				'satisfactionGuidelinesReference' => $moderation->getSatisfactionGuidelinesReference(),
+				'satisfactionRephrasingOptions' => $moderation->getSatisfactionRephrasingOptions(),
+				'remarks' => $moderation->getRemarks(),
+				'timestamp' => $moderation->getTimestamp()->format('Y-m-d H:i:s'),
+			];
+
+			$return_comment = [
+				'url' => $comment->getUrl(),
+				'title' => $comment->getTitle(),
+				'comment' => $comment->getComment(),
+				'contextComments' => json_decode($comment->getContextComments()),
+				'toxicityReasons' => $comment->getToxicityReasons(),
+				'violatedGuideline' => $comment->getViolatedGuideline(),
+				'rephrasedTextOptions' => json_decode($comment->getRephrasedTextOptions()),
+			];
+		}
+		
+		return $this->render('moderation/detail.html.twig', [
 			'auth' => $auth,
+			'comment_found' => $moderation != null,
+			'moderation' => $return_moderation,
+			'comment' => $return_comment,
         ]);
+    }
+
+	#[Route('/moderation/{auth}/api/comment/{moderation_id}', name: 'api_moderation_comment')]
+    public function commentApi(EntityManagerInterface $em, $auth, $moderation_id): Response
+    {
+		// * Check authentication
+		// TODO
+
+        $moderation = $em->getRepository(Moderation::class)->find($moderation_id);
+
+		$moderation->setAccepted(boolval($_POST['accepted']));
+		$moderation->setTimeUsed(intval($_POST['timeUsed']));
+		$moderation->setSatisfactionToxicityExplanation(Satisfaction::from($_POST['satisfactionToxicityExplanation']));
+		$moderation->setSatisfactionGuidelinesReference(Satisfaction::from($_POST['satisfactionGuidelinesReference']));
+		$moderation->setSatisfactionRephrasingOptions(Satisfaction::from($_POST['satisfactionRephrasingOptions']));
+		$moderation->setRemarks($_POST['remarks']);
+		
+		$em->persist($moderation);
+		$em->flush();
+
+		return new Response();
     }
 }
