@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Model\Satisfaction;
+use App\Model\TimeSelector;
 use App\Repository\ModerationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -22,8 +23,8 @@ class Moderation
     #[ORM\Column(nullable: true)]
     private ?bool $Accepted = null;
 
-    #[ORM\Column]
-    private ?int $TimeUsed = null;
+    #[ORM\Column(nullable: true, enumType: TimeSelector::class)]
+    private ?TimeSelector $TimeUsed = null;
 
     #[ORM\Column(nullable: true, enumType: Satisfaction::class)]
     private ?Satisfaction $SatisfactionToxicityExplanation = null;
@@ -69,12 +70,12 @@ class Moderation
         return $this;
     }
 
-    public function getTimeUsed(): ?int
+    public function getTimeUsed(): ?TimeSelector
     {
         return $this->TimeUsed;
     }
 
-    public function setTimeUsed(int $TimeUsed): static
+    public function setTimeUsed(?TimeSelector $TimeUsed): static
     {
         $this->TimeUsed = $TimeUsed;
 

@@ -88,13 +88,24 @@
 
 			{# Time used to handle this comment #}
 			<div class="form-group">
-				<label>Time used to handle this comment</label>
-				<div class="input-group mb-3">
-					<input type="text" class="form-control" placeholder="HH:MM:SS" onkeyup="updateTimerFromForm();" id="timeUsed">
-					<div class="input-group-append">
-						<button id="timeUsedButton" class="btn btn-success" type="button" onclick="toggleTimer();">Start Timer</button>
+				<label for="timeUsed">How much time did you need to handle this comment?</label>
+				{% set options = {
+					'<1m' : 'Less than 1 minute',
+					'1m-5m' : '1 minute - 5 minutes',
+					'5m-30m' : '5 minutes - 30 minutes',
+					'30m-1h' : '30 minutes - 1 hour',
+					'1h-4h' : '1 hour - 4 hours',
+					'>4h' : 'More than 4 hours'
+				} %}
+				{% for case in enum('App\\Model\\TimeSelector').cases %}
+					<div class="form-check mb-1">
+						<input class="form-check-input" type="radio" name="timeUsed"
+							id="timeUsed{{ case.value }}" value="{{ case.value }}"
+							{% if moderation.timeUsed.value ?? null == case.value %} checked {% endif %}>
+						<label class="form-check-label" for="timeUsed{{ case.value }}">
+							{{ options[case.value] }}</label>
 					</div>
-				</div>
+				{% endfor %}
 			</div>
 
 			{# Satisfaction with toxicity explanation #}
@@ -165,67 +176,6 @@
 
 {# JS #}
 {% block javascript %}
-	var timerIsRunning = false;
-	var timerTime = {{ moderation.timeUsed ?? 0 }};
-		
-	const toggleTimer = () => {
-		if (timerIsRunning) {
-			{# Stop timer #}
-			timerIsRunning = false;
-			$("#timeUsedButton")
-				.removeClass("btn-danger")
-				.addClass("btn-success")
-				.html("Start Timer");
-			$("#timeUsed").attr("disabled", false);
-		} else {
-			{# Start timer #}
-			timerIsRunning = true;
-			$("#timeUsedButton")
-				.removeClass("btn-success")
-				.addClass("btn-danger")
-				.html("Stop Timer");
-			$("#timeUsed").attr("disabled", true);
-		}
-	};
-		
-	const updateTimerInForm = () => {
-		const hours = Math.floor(timerTime / 3600);
-		const minutes = Math.floor((timerTime % 3600) / 60);
-		const seconds = timerTime % 60;
-		const formattedTime = String(hours).padStart(2, '0') + ':' +
-			String(minutes).padStart(2, '0') + ':' +
-			String(seconds).padStart(2, '0');
-		$("#timeUsed").val(formattedTime);
-	};
-	updateTimerInForm();
-		
-	const updateTimerFromForm = () => {
-		const timeString = $("#timeUsed").val();
-		const timeParts = timeString.split(':');
-		if (timeParts.length !== 3) {
-			alert("Invalid time format. Please use HH:MM:SS.");
-		}
-		
-		const hours = parseInt(timeParts[0], 10);
-		const minutes = parseInt(timeParts[1], 10);
-		const seconds = parseInt(timeParts[2], 10);
-		timerTime = (hours * 3600) + (minutes * 60) + seconds;
-	};
-
-	{# Update timer every second #}
-	setInterval(() => {
-		if (timerIsRunning) {
-			timerTime += 1;
-			updateTimerInForm();
-		}
-	}, 1000);
-		
-	$(document).ready(() => {
-		if(confirm("You will later be asked about the time you needed to handle this comment. Do you want to start an automatic timer now?")) {
-			toggleTimer();
-		}
-	});
-	
 	const formSubmit = () => {
 		{# check if Decision set #}
 		if ($("input[name='accepted']:checked").length === 0) {
@@ -233,14 +183,8 @@
 			return;
 		}
 
-		{# check if timer stopped #}
-		if (timerIsRunning) {
-			alert("Please stop the timer before submitting.");
-			return;
-		}
-
 		{# check if timeUsed != "" #}
-		if ($("#timeUsed").val() === "") {
+		if ($("input[name='timeUsed']:checked").length === 0) {
 			alert("Please enter the time used to handle this comment.");
 			return;
 		}
@@ -268,7 +212,7 @@
 			type: "POST",
 			data: {
 				"accepted": $("input[name='accepted']:checked").val(),
-				"timeUsed": timerTime,
+				"timeUsed": $("input[name='timeUsed']:checked").val(),
 				"satisfactionToxicityExplanation": $("input[name='satisfactionToxicityExplanation']:checked").val(),
 				"satisfactionGuidelinesReference": $("input[name='satisfactionGuidelinesReference']:checked").val(),
 				"satisfactionRephrasingOptions": $("input[name='satisfactionRephrasingOptions']:checked").val(),
