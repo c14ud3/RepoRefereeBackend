@@ -27,4 +27,16 @@ class AuthService
 
 		return in_array($key, $keys) && !is_null($commentsLogSource);
 	}
+
+	public static function github(string $key): bool
+	{
+		$env = new ENVService();
+		$env->loadEnv();
+
+		$keys = explode(';', $_ENV['GITHUB_AUTH_KEYS'] ?? '');
+
+		$commentsLogSource = CommentsLogSource::tryFrom(strtoupper(explode(':', $key)[0]));
+
+		return in_array($key, $keys) && !is_null($commentsLogSource);
+	}
 }
