@@ -20,9 +20,6 @@ final class GitHubController extends AbstractController
 		// 	!isset($REQUESTDATA['comment']) || empty($REQUESTDATA['comment']))
 		// 	return new Response('Nothing to do.');
 
-		return new Response(print_r([
-			'server' => $_SERVER,
-			'$REQUESTDATA' => $REQUESTDATA,
-		], true));
+		return new Response();
     }
 }
