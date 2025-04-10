@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Moderation;
+use App\Model\CommentsLogSource;
 use App\Model\Satisfaction;
 use App\Model\TimeSelector;
 use App\Service\AuthService;
@@ -60,14 +61,18 @@ final class ModerationController extends AbstractController
 
 		$return = [];
 
+		$sessionSource = CommentsLogSource::from(strtoupper(explode(':', $auth)[0]));
+
 		foreach($moderations as $moderation) {
-			$return[] = [
-				'id' => $moderation->getId(),
-				'accepted' => $moderation->isAccepted(),
-				'title' => $moderation->getComment()->getTitle(),
-				'url' => $moderation->getComment()->getUrl(),
-				'timestamp' => $moderation->getTimestamp()->format('d.m.y H:i'),
-			];
+			if($moderation->getComment()->getSource() == $sessionSource) {
+				$return[] = [
+					'id' => $moderation->getId(),
+					'accepted' => $moderation->isAccepted(),
+					'title' => $moderation->getComment()->getTitle(),
+					'url' => $moderation->getComment()->getUrl(),
+					'timestamp' => $moderation->getTimestamp()->format('d.m.y H:i'),
+				];
+			}
 		}
 
 		return new Response(json_encode($return));
@@ -81,6 +86,10 @@ final class ModerationController extends AbstractController
 			return new Response('Unauthorized', 401);
 
         $moderation = $em->getRepository(Moderation::class)->find($comment_id);
+
+		if($moderation->getComment()->getSource() != CommentsLogSource::from(strtoupper(explode(':', $auth)[0]))) {
+			return new Response('Unauthorized', 401);
+		}
 
 		$return_moderation = [];
 		$return_comment = [];
@@ -136,6 +145,10 @@ final class ModerationController extends AbstractController
 			return new Response('Unauthorized', 401);
 
         $moderation = $em->getRepository(Moderation::class)->find($moderation_id);
+
+		if($moderation->getComment()->getSource() != CommentsLogSource::from(strtoupper(explode(':', $auth)[0]))) {
+			return new Response('Unauthorized', 401);
+		}
 
 		$moderation->setAccepted(boolval($_POST['accepted']));
 		$moderation->setTimeUsed(TimeSelector::from($_POST['timeUsed']));

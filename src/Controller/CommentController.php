@@ -51,6 +51,7 @@ final class CommentController extends AbstractController
 			$previousCommentData = $em->getRepository(CommentsLog::class)->findBy([
 				'url' => $REQUESTDATA['url'],
 				'comment' => $REQUESTDATA['comment'],
+				'source' => CommentsLogSource::BUGZILLA
 			]);
 
 			if(count($previousCommentData) > 0)
