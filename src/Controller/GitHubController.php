@@ -16,6 +16,11 @@ final class GitHubController extends AbstractController
 		// * Load request data
 		$REQUESTDATA = json_decode(file_get_contents('php://input') ?? '{}', true) ?? [];
 
-		return new Response(print_r($REQUESTDATA, true));
+		return new Response(print_r([
+			'REQUESTDATA' => $REQUESTDATA,
+			'POST' => $_POST,
+			'GET' => $_GET,
+			'SERVER' => $_SERVER,
+		], true));
     }
 }
