@@ -16,16 +16,6 @@ class AuthService
 		return in_array($key, $keys);
 	}
 
-	public static function logger(string $key): bool
-	{
-		$env = new ENVService();
-		$env->loadEnv();
-
-		$keys = explode(';', $_ENV['LOGGER_AUTH_KEYS'] ?? '');
-
-		return in_array($key, $keys);
-	}
-
 	public static function moderation(string $key): bool
 	{
 		$env = new ENVService();
