@@ -138,7 +138,6 @@ final class ModerationController extends AbstractController
         $moderation = $em->getRepository(Moderation::class)->find($moderation_id);
 
 		$moderation->setAccepted(boolval($_POST['accepted']));
-		$moderation->setTimeUsed(TimeSelector::from($_POST['timeUsed']));
 		$moderation->setSatisfactionToxicityExplanation(Satisfaction::from($_POST['satisfactionToxicityExplanation']));
 		$moderation->setSatisfactionGuidelinesReference(Satisfaction::from($_POST['satisfactionGuidelinesReference']));
 		$moderation->setSatisfactionRephrasingOptions(Satisfaction::from($_POST['satisfactionRephrasingOptions']));
