@@ -145,7 +145,7 @@
 			{# Satisfaction with rephrasing options #}
 			<div class="form-group">
 				<label for="satisfactionRephrasingOptions">How satisfied are you with the
-					<u>guidelines reference</u>?</label>
+					<u>rephrasing options</u>?</label>
 				<div class="d-flex">
 					{% for case in enum('App\\Model\\Satisfaction').cases %}
 						<div class="form-check mr-5">
@@ -179,7 +179,7 @@
 	const formSubmit = () => {
 		{# check if Decision set #}
 		if ($("input[name='accepted']:checked").length === 0) {
-			alert("Please select a decision (accept or reject).");
+			alert("Please select an option on whether you did need to handle the comment or not.");
 			return;
 		}
 
