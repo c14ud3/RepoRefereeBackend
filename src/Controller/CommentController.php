@@ -106,7 +106,6 @@ final class CommentController extends AbstractController
 				// Add comment to Moderation DB
 				$moderation = new Moderation();
 				$moderation->setComment($commentLog);
-				$moderation->setTimeUsed(0);
 				$moderation->setRemarks('');
 				$moderation->setTimestamp(new \DateTime('now', new \DateTimeZone('Europe/Zurich')));
 				$em->persist($moderation);
