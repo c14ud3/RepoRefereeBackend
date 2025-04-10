@@ -16,12 +16,13 @@ final class GitHubController extends AbstractController
 		// * Load request data
 		$REQUESTDATA = json_decode(file_get_contents('php://input') ?? '{}', true) ?? [];
 
-		if(!isset($REQUESTDATA['action']) || !in_array($REQUESTDATA['action'], ['opened', 'created']) ||
-			!isset($REQUESTDATA['comment']) || empty($REQUESTDATA['comment']))
-			return new Response('Nothing to do.');
+		// if(!isset($REQUESTDATA['action']) || !in_array($REQUESTDATA['action'], ['opened', 'created']) ||
+		// 	!isset($REQUESTDATA['comment']) || empty($REQUESTDATA['comment']))
+		// 	return new Response('Nothing to do.');
 
 		return new Response(print_r([
-			$_SERVER
+			'server' => $_SERVER,
+			'$REQUESTDATA' => $REQUESTDATA,
 		], true));
     }
 }
