@@ -53,6 +53,7 @@ $debug = [];
 			// add all comments to the context comments by performing a request to the comment url
 			try {
 				$commentsRequest = file_get_contents($REQUESTDATA['issue']['comments_url'] ?? '');
+$debug[] = 'url: ' . $REQUESTDATA['issue']['comments_url'];
 $debug[] = 'commentsRequest: ' . $commentsRequest;
 				$commentsJSON = json_decode($commentsRequest, true) ?? [];
 $debug[] = 'commentsJSON: ' . json_encode($commentsJSON);
