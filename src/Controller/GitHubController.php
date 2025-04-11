@@ -21,6 +21,7 @@ final class GitHubController extends AbstractController
 		$auth
 	): Response
     {
+$debug = [];
 		// * Check authentication
 		if (!AuthService::github($auth))
 			return new Response('Unauthorized', 401);
@@ -52,11 +53,11 @@ final class GitHubController extends AbstractController
 			// add all comments to the context comments by performing a request to the comment url
 			try {
 				$commentsRequest = file_get_contents($REQUESTDATA['issue']['comments_url'] ?? '');
-error_log('commentsRequest: ' . $commentsRequest);
+$debug[] = 'commentsRequest: ' . $commentsRequest;
 				$commentsJSON = json_decode($commentsRequest, true) ?? [];
-error_log('commentsJSON: ' . json_encode($commentsJSON));
+$debug[] = 'commentsJSON: ' . json_encode($commentsJSON);
 				foreach($commentsJSON as $comment) {
-error_log('comment: id:' . $comment['id'] . ' body:' . $comment['body']);
+$debug[] = 'comment: id:' . $comment['id'] . ' body:' . $comment['body'];
 					if($comment['id'] != $REQUESTDATA['comment']['id']) {
 						$contextComments[] = $comment['body'] ?? '';
 					}
@@ -122,6 +123,7 @@ error_log('comment: id:' . $comment['id'] . ' body:' . $comment['body']);
 			$em->flush();
 		}
 
+return new Response(print_r($debug, true));
 		return new Response('OK');
     }
 }
