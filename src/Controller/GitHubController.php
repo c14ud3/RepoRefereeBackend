@@ -77,6 +77,14 @@ final class GitHubController extends AbstractController
 			return new Response('Corresponding data not found in request.', 400);
 		}
 
+		// * Check if the request is from a GitHub Bot -> break
+		if(
+			str_starts_with($comment, '/botio') || 
+			str_contains($comment, '#### From: Bot.io')
+		) {
+			return new Response('Request from or to Bot detected. Ignoring.');
+		}
+
 		// * Request to ChatGPT
 		$response = $gpt->request(
 			$title,
