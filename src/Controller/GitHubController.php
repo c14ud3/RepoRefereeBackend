@@ -21,7 +21,6 @@ final class GitHubController extends AbstractController
 		$auth
 	): Response
     {
-$debug = [];
 		// * Check authentication
 		if (!AuthService::github($auth))
 			return new Response('Unauthorized', 401);
@@ -45,31 +44,9 @@ $debug = [];
 			// dealing with an issue_comment
 			$url = $REQUESTDATA['comment']['html_url'] ?? '';
 			$title = $REQUESTDATA['issue']['title'] ?? '';
-
 			$contextComments = [
 				$REQUESTDATA['issue']['body'] ?? '', // the original issue comment is the first context comment
 			];
-
-			// add all comments to the context comments by performing a request to the comment url
-			try {
-				$commentsRequest = file_get_contents($REQUESTDATA['issue']['comments_url'] ?? '');
-$debug[] = 'url: ' . $REQUESTDATA['issue']['comments_url'];
-$debug[] = 'commentsRequest: ' . $commentsRequest;
-				$commentsJSON = json_decode($commentsRequest, true) ?? [];
-$debug[] = 'commentsJSON: ' . json_encode($commentsJSON);
-				foreach($commentsJSON as $comment) {
-$debug[] = 'comment: id:' . $comment['id'] . ' body:' . $comment['body'];
-					if($comment['id'] != $REQUESTDATA['comment']['id']) {
-						$contextComments[] = $comment['body'] ?? '';
-					}
-				}
-			} catch(\Exception $e) {}
-
-			// remove all empty strings from contextComments
-			$contextComments = array_filter($contextComments, function($comment) {
-				return !empty(trim($comment));
-			});
-
 			$comment = $REQUESTDATA['comment']['body'] ?? '';
 		} else if(isset($REQUESTDATA['issue'])) {
 			// ! 'issue' is set aswell in 'issue_comment'
@@ -124,7 +101,6 @@ $debug[] = 'comment: id:' . $comment['id'] . ' body:' . $comment['body'];
 			$em->flush();
 		}
 
-return new Response(print_r($debug, true));
 		return new Response('OK');
     }
 }
