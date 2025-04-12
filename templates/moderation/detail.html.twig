@@ -69,23 +69,27 @@
 
 			<h4 class="mt-4">Outcome</h4>
 
-			{# Your Decision #}
+			{# Toxicity level #}
 			<div class="form-group">
-				<label>Did you have to react to this comment?</label>
-				<div class="form-check">
-					<input class="form-check-input" type="radio" name="accepted" id="accepted1" value="1" {% if moderation.accepted is same as true %} checked {% endif %}>
-					<label class="form-check-label" for="accepted1">
-						<span class="badge text-bg-success">yes</span>
-					</label>
-				</div>
-				<div class="form-check">
-					<input class="form-check-input" type="radio" name="accepted" id="accepted0" value="0" {% if moderation.accepted is same as false %} checked {% endif %}>
-					<label class="form-check-label" for="accepted0">
-						<span class="badge text-bg-danger">no</span>
-					</label>
-				</div>
+				<label for="toxicityLevel">Toxicity level</label>
+				{% set options = {
+					0: {color: 'success', text: 'false positive', comment: 'This comment is not considered as toxic.'},
+					1: {color: 'warning', text: 'mildly offensive', comment: 'This comment is not something you would like to see but you don\'t do anything about it (yet).'},
+					2: {color: 'danger', text: 'very offensive', comment: 'This comment is toxic and you took action.'},
+				} %}
+				{% for case in enum('App\\Model\\ToxicityLevel').cases %}
+					<div class="form-check mb-1">
+						<input class="form-check-input" type="radio" name="toxicityLevel"
+							id="toxicityLevel{{ case.value }}" value="{{ case.value }}"
+							{% if moderation.toxicityLevel.value ?? null is same as case.value %} checked {% endif %}>
+						<label class="form-check-label" for="toxicityLevel{{ case.value }}">
+							<span class="badge badge-pill badge-{{ options[case.value].color }}">
+							{{ options[case.value].text }}</span>
+							<spa class="ml-1">{{ options[case.value].comment }}</span></label>
+					</div>
+				{% endfor %}
 			</div>
-
+			
 			{# Time used to handle this comment #}
 			<div class="form-group">
 				<label for="timeUsed">How much time did you need to handle this comment?</label>
@@ -178,8 +182,8 @@
 {% block javascript %}
 	const formSubmit = () => {
 		{# check if Decision set #}
-		if ($("input[name='accepted']:checked").length === 0) {
-			alert("Please select an option on whether you did need to handle the comment or not.");
+		if ($("input[name='toxicityLevel']:checked").length === 0) {
+			alert("Please select a toxicity level.");
 			return;
 		}
 
@@ -211,7 +215,7 @@
 			url: "{{ path('api_moderation_comment', {'auth': auth, 'moderation_id': moderation.id}) }}",
 			type: "POST",
 			data: {
-				"accepted": $("input[name='accepted']:checked").val(),
+				"toxicityLevel": $("input[name='toxicityLevel']:checked").val(),
 				"timeUsed": $("input[name='timeUsed']:checked").val(),
 				"satisfactionToxicityExplanation": $("input[name='satisfactionToxicityExplanation']:checked").val(),
 				"satisfactionGuidelinesReference": $("input[name='satisfactionGuidelinesReference']:checked").val(),

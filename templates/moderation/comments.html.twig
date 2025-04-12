@@ -7,8 +7,9 @@
 			<select class="form-select" id="filterSelect">
 				<option value="all">all</option>
 				<option value="open">open</option>
-				<option value="accepted">reacted</option>
-				<option value="rejected">no reaction needed</option>
+				<option value="0">false positive</option>
+				<option value="1">mildly offensive</option>
+				<option value="2">very offensive</option>
 			</select>
 			<label for="filterSelect">Filter</label>
 		</div>
@@ -30,7 +31,7 @@
 			<thead>
 				<tr>
 					<th scope="col"></th>
-					<th scope="col">State</th>
+					<th scope="col">Toxicity level</th>
 					<th scope="col">Link</th>
 					<th scope="col">Title</th>
 					<th scope="col">Timestamp</th>
@@ -55,10 +56,12 @@
 				htmlTable = "";
 				JSON.parse(data).forEach((comment) => {
 					var badge = "";
-					if(comment.accepted === true)
-						badge = `<span class="badge badge-pill badge-success">reacted</span>`;
-					else if(comment.accepted === false)
-						badge = `<span class="badge badge-pill badge-danger">no reaction<br>needed</span>`;
+					if(comment.toxicityLevel === 2)
+						badge = `<span class="badge badge-pill badge-danger">very offensive</span>`;
+					else if(comment.toxicityLevel === 1)
+						badge = `<span class="badge badge-pill badge-warning">mildly offensive</span>`;
+					else if(comment.toxicityLevel === 0)
+						badge = `<span class="badge badge-pill badge-success">false positive</span>`;
 					else
 						badge = `<span class="badge badge-pill badge-secondary">open</span>`;
 

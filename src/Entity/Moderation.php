@@ -7,6 +7,7 @@ use App\Model\TimeSelector;
 use App\Repository\ModerationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use \App\Model\ToxicityLevel;
 
 #[ORM\Entity(repositoryClass: ModerationRepository::class)]
 class Moderation
@@ -20,8 +21,8 @@ class Moderation
     #[ORM\JoinColumn(nullable: false)]
     private ?CommentsLog $Comment = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?bool $Accepted = null;
+	#[ORM\Column(nullable: true, enumType: ToxicityLevel::class)]
+    private ?ToxicityLevel $ToxicityLevel = null;
 
     #[ORM\Column(nullable: true, enumType: TimeSelector::class)]
     private ?TimeSelector $TimeUsed = null;
@@ -58,14 +59,14 @@ class Moderation
         return $this;
     }
 
-    public function isAccepted(): ?bool
+	public function getToxicityLevel(): ?ToxicityLevel
     {
-        return $this->Accepted;
+        return $this->ToxicityLevel;
     }
 
-    public function setAccepted(bool $Accepted): static
+    public function setToxicityLevel(?ToxicityLevel $ToxicityLevel): static
     {
-        $this->Accepted = $Accepted;
+        $this->ToxicityLevel = $ToxicityLevel;
 
         return $this;
     }

@@ -6,6 +6,7 @@ use App\Entity\Moderation;
 use App\Model\CommentsLogSource;
 use App\Model\Satisfaction;
 use App\Model\TimeSelector;
+use App\Model\ToxicityLevel;
 use App\Service\AuthService;
 use App\Service\ModerationService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -50,9 +51,9 @@ final class ModerationController extends AbstractController
 		list($param_filter, $param_order) = explode('-', $params);
 
 		$criteria = [];
-		if($param_filter == 'open') $criteria = ['Accepted' => null];
-		else if($param_filter == 'accepted') $criteria = ['Accepted' => true];
-		else if($param_filter == 'rejected') $criteria = ['Accepted' => false];
+		if($param_filter == 'open') $criteria = ['ToxicityLevel' => null];
+		else if(in_array($param_filter, [0, 1, 2]))
+			$criteria = ['ToxicityLevel' => ToxicityLevel::from(intval($param_filter))];
 
 		$moderations = $em->getRepository(Moderation::class)->findBy(
 			$criteria,
@@ -67,7 +68,7 @@ final class ModerationController extends AbstractController
 			if($moderation->getComment()->getSource() == $sessionSource) {
 				$return[] = [
 					'id' => $moderation->getId(),
-					'accepted' => $moderation->isAccepted(),
+					'toxicityLevel' => $moderation->getToxicityLevel(),
 					'title' => $moderation->getComment()->getTitle(),
 					'url' => $moderation->getComment()->getUrl(),
 					'timestamp' => $moderation->getTimestamp()->format('d.m.y H:i'),
@@ -99,7 +100,7 @@ final class ModerationController extends AbstractController
 
 			$return_moderation = [
 				'id' => $moderation->getId(),
-				'accepted' => $moderation->isAccepted(),
+				'toxicityLevel' => $moderation->getToxicityLevel(),
 				'timeUsed' => $moderation->getTimeUsed(),
 				'satisfactionToxicityExplanation' => $moderation->getSatisfactionToxicityExplanation(),
 				'satisfactionGuidelinesReference' => $moderation->getSatisfactionGuidelinesReference(),
@@ -150,7 +151,7 @@ final class ModerationController extends AbstractController
 			return new Response('Unauthorized', 401);
 		}
 
-		$moderation->setAccepted(boolval($_POST['accepted']));
+		$moderation->setToxicityLevel(ToxicityLevel::from($_POST['toxicityLevel']));
 		$moderation->setTimeUsed(TimeSelector::from($_POST['timeUsed']));
 		$moderation->setSatisfactionToxicityExplanation(Satisfaction::from($_POST['satisfactionToxicityExplanation']));
 		$moderation->setSatisfactionGuidelinesReference(Satisfaction::from($_POST['satisfactionGuidelinesReference']));
