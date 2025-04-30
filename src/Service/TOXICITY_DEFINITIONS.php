@@ -130,21 +130,32 @@ class TOXICITY_DEFINITIONS
 		],
 	  
 		"Entitlement" => [
+			"Please use English in bugzilla.",
+			"Well, direct manipulation of the UI like that is not supported. If you're still doing it you can monkey patch those functions as you go.",
 		],
 	  
 		"Arrogance" => [
+			"Well, direct manipulation of the UI like that is not supported. If you're still doing it you can monkey patch those functions as you go.",
 		],
 	  
 		"BitterFrustration" => [
+			"Well hope the upcoming work on calendar setup as part of account hub effort will uncover this bug and get it finally fixed.",
+			"Been there once, don't remember the logic chain, it's a complete mess.",
 		],
 	  
 		"Mocking" => [
+			"Ok I can see this. Thanks for digging into this, and apologies for the \"not a bug\" case.",
+			"Wow, now lots of complaints above about running pop3 serially. Maybe not such a good idea and better to go back to parallel? FWIW, I reverted back to the parallel JS code here: bug 1891962 comment 248,  but didn't make a difference there for that bug. Another option is revert way back to pop3 in c++ like here: bug 1891962 comment 308 which actually did fix that bug because no console calls. AFAIK, the c++ pop3 didn't have hang/crash issues with multiple accounts and testers at bug 1891962 ran at least a week with c++ pop3 with multiple accounts with no issues.",
 		],
 	  
 		"Impatience" => [
+			"Need to remove \" Status: VERIFIED FIXED\" It will not let me do that.",
+			"The problem still persists today so I shall move to using another browser from now on or until I hear that a new update to Firefox has produced a solution.",
+			"This issue with \"GPU process\" is still there, maybe its now more exacerbated... Why on low priority?",
 		],
 	  
 		"Irony" => [
+			"-> WFM",
 		],
 	];
 
