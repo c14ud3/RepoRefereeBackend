@@ -62,7 +62,7 @@ class RepoRefereeGPTService extends GPTService
 			$prompt .= ' - ' . $toxicityDescription . ': ' . TOXICITY_DEFINITIONS::PROMPT_DEFINITIONS[$toxicityType] . '. ';
 
 			// Positive examples
-			if (count (TOXICITY_DEFINITIONS::PROMPT_POSITIVE_COMMENTS) > 0)
+			if (count (TOXICITY_DEFINITIONS::PROMPT_POSITIVE_COMMENTS[$toxicityType]) > 0)
 			{
 				$prompt .= 'Examples of ' . $toxicityDescription . ': ';
 
@@ -71,8 +71,23 @@ class RepoRefereeGPTService extends GPTService
 					$comments[] = '"' . $comment . '"';
 
 				$prompt .= implode (', ', $comments);
-				$prompt .= '.\n';
+				$prompt .= '. ';
 			}
+
+			// Negative examples
+			if (count (TOXICITY_DEFINITIONS::PROMPT_NEGATIVE_COMMENTS[$toxicityType]) > 0)
+			{
+				$prompt .= 'The following examples would not be considered as ' . $toxicityDescription . ': ';
+
+				$comments = [];
+				foreach (TOXICITY_DEFINITIONS::PROMPT_NEGATIVE_COMMENTS[$toxicityType] as $comment)
+					$comments[] = '"' . $comment . '"';
+
+				$prompt .= implode (', ', $comments);
+				$prompt .= '.';
+			}
+
+			$prompt .= '\n';
 		}
 		$prompt .= '\n';
 
