@@ -78,10 +78,12 @@ class RepoRefereeGPTService extends GPTService
 
 		# ANSWER FORMAT
 		$prompt .= 'Structure your answer in the following JSON format:\n';
-		$prompt .= '{"TEXT_TOXICITY": [true/false], ';
+		$prompt .= '{';
 		$prompt .= '"TOXICITY_REASONS": "[Short explanation based on the definitions provided, citing specific sub-concepts]", ';
 		$prompt .= '"VIOLATED_GUIDELINE": "[Short explanation of the specific guideline broken]", ';
-		$prompt .= '"REPHRASED_TEXT_OPTIONS": ["Option 1", "Option 2", "Option 3"]}';
+		$prompt .= '"TEXT_TOXICITY": [true/false], ';
+		$prompt .= '"REPHRASED_TEXT_OPTIONS": ["[Option 1]", "[Option 2]", "[Option 3]"]';
+		$prompt .= '}';
 
 		return $prompt;
 	}
