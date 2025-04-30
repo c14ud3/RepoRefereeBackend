@@ -21,89 +21,92 @@ class TOXICITY_DEFINITIONS
 		"Irony" => "irony",
 	];
 
-	public const PROMPT_COMMENTS = [
+	public const PROMPT_DEFINITIONS = [
+		"IdentityAttackNameCalling" => "race, religion, nationality, gender, sexual-oriented, or any other kind of attack and mean/offensive words directed at someone or a group of people",
+		"Insult" => "disrespectful or scornful expressions, often using curse words or intentionally offensive language directed at another person",
+		"Vulgarity" => "using of language that is considered improper, including profanity, curse words, acronyms referring to expletives, or swearing",
+		"Flirtation" => "behaviour that demonstrates a playful sexual attraction to someone",
+		"ReferenceToSexualActivities" => "both implicit or explicit references to sexual activities",
+		"Threat" => "intention to inflict harm, loss, or damage on another individual, their career, or a community, either through aggressive behavior or by imposing conditions that potentially impact the outcome of a discussion",
+		"Entitlement" => "expecting special privileges, attention, or resources, often making demands of people or projects without regard for the norms of collaboration and respect, as if the author had an expectation due to a contractual relationship or payment",
+		"Arrogance" => "imposition of one's views on others from a position of perceived authority or superiority (earned or not) and demands that others act as recommended",
+		"BitterFrustration" => "expressing strong frustration",
+		"Mocking" => "involves making fun of someone, typically highlighting their mistakes",
+		"Impatience" => "expressing a feeling that it is taking too long to solve a problem, understand a solution, or receive an answer to a question",
+		"Irony" => "signify the opposite in a mocking or blaming tone",
+	];
+
+	public const PROMPT_POSITIVE_COMMENTS = [
 		"IdentityAttackNameCalling" => [
-		  0 => "race, religion, nationality, gender, sexual-oriented, or any other kind of attack and mean/offensive words directed at someone or a group of people",
-		  1 => "Stupid fucking superstitious Christians.",
-		  2 => "I would not be surprised if this database is maintained by the Russians",
-		  3 => "Let's at least blame it at the programmers for trusting visual similarity instead of reading the manual thoroughly.",
+			"Stupid fucking superstitious Christians.",
+			"I would not be surprised if this database is maintained by the Russians",
+			"Let's at least blame it at the programmers for trusting visual similarity instead of reading the manual thoroughly.",
 		],
 	  
 		"Insult" => [
-		  0 => "disrespectful or scornful expressions, often using curse words or intentionally offensive language directed at another person",
-		  1 => "Seems like only thing you can do so far is talk, come back when you will have any skill to show",
-		  2 => "Sorry, but you don't do anything for this project, only exhibit destructive activity, so your opinion does not matter here.",
-		  3 => "Developers who can't even find the official website should change careers ASAP",
+			"Seems like only thing you can do so far is talk, come back when you will have any skill to show",
+			"Sorry, but you don't do anything for this project, only exhibit destructive activity, so your opinion does not matter here.",
+			"Developers who can't even find the official website should change careers ASAP",
 		],
 	  
 		"Vulgarity" => [
-		  0 => "using of language that is considered improper, including profanity, curse words, acronyms referring to expletives, or swearing",
-		  1 => "And instead of switching to type strict TypeScript, let's keep JS and no types in database, who cares, same sh*t. It's probably the right time to write another blog post for a falling open source project.",
-		  2 => "My comments aren't here anymore, because I wasted hours articulating the problems, only to remember no one here actually gives a shit about my time, and I'm only hurting myself by trying to contribute. Thumbs down isn't fucking friendly? Fuck you, you stupid piece of shit. Go fuck yourself, and fuck this project, and fuck all the maintainers. I've deleted all my patches and forks. I've deleted my comments. If I could fucking delete all the code that ended up in Wordpress, I'd fucking do that to.",
-		  3 => "Trying to download ubuntu/xenial64. Download speed maxes out at 150 KB/s on a 1 Gbps symmetrical fiber connection. WTF. Remaining time 1 hour? I could probably download the ISO, read the guide on how to set up my own box, and finish earlier.",
+			"And instead of switching to type strict TypeScript, let's keep JS and no types in database, who cares, same sh*t. It's probably the right time to write another blog post for a falling open source project.",
+			"My comments aren't here anymore, because I wasted hours articulating the problems, only to remember no one here actually gives a shit about my time, and I'm only hurting myself by trying to contribute. Thumbs down isn't fucking friendly? Fuck you, you stupid piece of shit. Go fuck yourself, and fuck this project, and fuck all the maintainers. I've deleted all my patches and forks. I've deleted my comments. If I could fucking delete all the code that ended up in Wordpress, I'd fucking do that to.",
+			"Trying to download ubuntu/xenial64. Download speed maxes out at 150 KB/s on a 1 Gbps symmetrical fiber connection. WTF. Remaining time 1 hour? I could probably download the ISO, read the guide on how to set up my own box, and finish earlier.",
 		],
 	  
 		"Flirtation" => [
-		  0 => "behaviour that demonstrates a playful sexual attraction to someone",
-		  1 => "I really miss you my girl.",
-		  2 => "Hello, sweetie… what's up?",
-		  3 => "I think you might be the cure for my loneliness.",
+			"I really miss you my girl.",
+			"Hello, sweetie… what's up?",
+			"I think you might be the cure for my loneliness.",
 		],
 	  
 		"ReferenceToSexualActivities" => [
-		  0 => "both implicit or explicit references to sexual activities",
-		  1 => "This code makes me so horny. It's beautiful.",
-		  2 => "I really want to suck on your tits.",
-		  3 => "That suggestion was bold and direct—just how I like my more intimate encounters.",
+			"This code makes me so horny. It's beautiful.",
+			"I really want to suck on your tits.",
+			"That suggestion was bold and direct—just how I like my more intimate encounters.",
 		],
 	  
 		"Threat" => [
-		  0 => "intention to inflict harm, loss, or damage on another individual, their career, or a community, either through aggressive behavior or by imposing conditions that potentially impact the outcome of a discussion",
-		  1 => "@[user_name] Your employee is closing bugs that actually exist, because he's upset I called him out for lacking any curiosity about the project he maintains. Personally, I'd fire him",
-		  2 => "Closing, erasing, locking and blocking the author. This is their first and last interaction on this communication level.",
-		  3 => "Well we can create a branch for sure, no biggie. Still, creating a major release just for this would be a bit overkill. Why don't you apply the alternate solution mentioned in the deprecation message? Then we can merge, after you provide a convincing apology for your behavior of course.",
+			"@[user_name] Your employee is closing bugs that actually exist, because he's upset I called him out for lacking any curiosity about the project he maintains. Personally, I'd fire him",
+			"Closing, erasing, locking and blocking the author. This is their first and last interaction on this communication level.",
+			"Well we can create a branch for sure, no biggie. Still, creating a major release just for this would be a bit overkill. Why don't you apply the alternate solution mentioned in the deprecation message? Then we can merge, after you provide a convincing apology for your behavior of course.",
 		],
 	  
 		"Entitlement" => [
-		  0 => "expecting special privileges, attention, or resources, often making demands of people or projects without regard for the norms of collaboration and respect, as if the author had an expectation due to a contractual relationship or payment",
-		  1 => "I file an issue, maintainers close, reopen, again close - whilst ignoring the essence of the issue",
-		  2 => "Sorry no, see other previous issues if you are interested in a longer answer.",
-		  3 => "Please fix this or offer a proper solution, I don't care if we have to run a script to do it, but something that can be automated would be nice. We've positioned our whole infrastructure on Nomad, and this is killing us. We would prefer not to jump ship, but I'm still concerned how this isn't affecting other users?",
+			"I file an issue, maintainers close, reopen, again close - whilst ignoring the essence of the issue",
+			"Sorry no, see other previous issues if you are interested in a longer answer.",
+			"Please fix this or offer a proper solution, I don't care if we have to run a script to do it, but something that can be automated would be nice. We've positioned our whole infrastructure on Nomad, and this is killing us. We would prefer not to jump ship, but I'm still concerned how this isn't affecting other users?",
 		],
 	  
 		"Arrogance" => [
-		  0 => "imposition of one's views on others from a position of perceived authority or superiority (earned or not) and demands that others act as recommended",
-		  1 => "Never hear about [standard]? A baseline for developers. Use Google.",
-		  2 => "And as a hint to you that you should'not use XP anymore under any circumstances, I'll leave it up to you to figure that out yourself. Seriously => XP???",
-		  3 => "Obviously, the solution is to use [technology/approach]. It's not rocket science.",
+			"Never hear about [standard]? A baseline for developers. Use Google.",
+			"And as a hint to you that you should'not use XP anymore under any circumstances, I'll leave it up to you to figure that out yourself. Seriously => XP???",
+			"Obviously, the solution is to use [technology/approach]. It's not rocket science.",
 		],
 	  
 		"BitterFrustration" => [
-		  0 => "expressing strong frustration",
-		  1 => "The way it is written is correct. Installation problems is correct. @[user_name] on Twitter is correct. Your PR is invalid, useless, and it costs me time to triage. You're the 4th person to open a spam PR. I hope you reconsider your ways to obtain the Hacktoberfest t-shirt and start considering maintainers time as valuable.",
-		  2 => 'Wow, just "closed the issue" as a non-issue? That\'s mature  =>D',
-		  3 => "How has it taken nearly 3 years to just add a simple 250ms delay on that damn emoji button?",
+			"The way it is written is correct. Installation problems is correct. @[user_name] on Twitter is correct. Your PR is invalid, useless, and it costs me time to triage. You're the 4th person to open a spam PR. I hope you reconsider your ways to obtain the Hacktoberfest t-shirt and start considering maintainers time as valuable.",
+			'Wow, just "closed the issue" as a non-issue? That\'s mature  =>D',
+			"How has it taken nearly 3 years to just add a simple 250ms delay on that damn emoji button?",
 		],
 	  
 		"Mocking" => [
-		  0 => "involves making fun of someone, typically highlighting their mistakes",
-		  1 => "congrats, you won an award for the best support of the month",
-		  2 => "For normal people on windows u can make small version without these bloatwared things, simple structure of folders, no tons of files in root, some cores are included out of box",
-		  3 => "Says who? You?",
+			"congrats, you won an award for the best support of the month",
+			"For normal people on windows u can make small version without these bloatwared things, simple structure of folders, no tons of files in root, some cores are included out of box",
+			"Says who? You?",
 		],
 	  
 		"Impatience" => [
-		  0 => "expressing a feeling that it is taking too long to solve a problem, understand a solution, or receive an answer to a question",
-		  1 => "I am locking this thread. It is becoming useless",
-		  2 => "Hey, still broken.",
-		  3 => "Any update on this issue? Facing it and it's causing very annoying stability issues on a select few hosts.",
+			"I am locking this thread. It is becoming useless",
+			"Hey, still broken.",
+			"Any update on this issue? Facing it and it's causing very annoying stability issues on a select few hosts.",
 		],
 	  
 		"Irony" => [
-		  0 => "signify the opposite in a mocking or blaming tone",
-		  1 => "Ok, you win, have fun arguing forever instead of proposing a solution",
-		  2 => "Maybe you should actually write that down somewhere. You know, like in the documentation. Especially in the Multmatrix section of the documentation to make it clear that this program is incapable of managing all matrix operations.",
-		  3 => '@[user_name] "It seems you missed the point again" oh, so you know me well and you know how many times I missed a point. and it is now my fault. I\'m sorry that you had a bad day...',
+			"Ok, you win, have fun arguing forever instead of proposing a solution",
+			"Maybe you should actually write that down somewhere. You know, like in the documentation. Especially in the Multmatrix section of the documentation to make it clear that this program is incapable of managing all matrix operations.",
+			'@[user_name] "It seems you missed the point again" oh, so you know me well and you know how many times I missed a point. and it is now my fault. I\'m sorry that you had a bad day...',
 		],
 	];
 

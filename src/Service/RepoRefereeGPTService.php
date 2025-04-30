@@ -54,16 +54,25 @@ class RepoRefereeGPTService extends GPTService
 	protected function generatePrompt(string $messageWithContext): string
 	{
 		// Toxicity definition
-		$prompt = TOXICITY_DEFINITIONS::TOXICITY_DEFINITION . '\n' .
+		$prompt = TOXICITY_DEFINITIONS::TOXICITY_DEFINITION . '\n\n' .
 			'Sub-concepts of toxicity are defined below:\n';
 
 		// Sub toxicity definition
 		foreach (TOXICITY_DEFINITIONS::TOXICITY_TYPES as $toxicityType => $toxicityDescription) {
-			$prompt .= ' - ' . $toxicityDescription . ': ' . TOXICITY_DEFINITIONS::PROMPT_COMMENTS[$toxicityType][0] . '. ' .
-				'Examples of ' . $toxicityDescription . ': ';
-			$prompt .= '"' . TOXICITY_DEFINITIONS::PROMPT_COMMENTS[$toxicityType][1] . '", ';
-			$prompt .= '"' . TOXICITY_DEFINITIONS::PROMPT_COMMENTS[$toxicityType][2] . '", ';
-			$prompt .= '"' . TOXICITY_DEFINITIONS::PROMPT_COMMENTS[$toxicityType][3] . '"\n';
+			$prompt .= ' - ' . $toxicityDescription . ': ' . TOXICITY_DEFINITIONS::PROMPT_DEFINITIONS[$toxicityType] . '. ';
+
+			// Positive examples
+			if (count (TOXICITY_DEFINITIONS::PROMPT_POSITIVE_COMMENTS) > 0)
+			{
+				$prompt .= 'Examples of ' . $toxicityDescription . ': ';
+
+				$comments = [];
+				foreach (TOXICITY_DEFINITIONS::PROMPT_POSITIVE_COMMENTS[$toxicityType] as $comment)
+					$comments[] = '"' . $comment . '"';
+
+				$prompt .= implode (', ', $comments);
+				$prompt .= '.\n';
+			}
 		}
 		$prompt .= '\n';
 
