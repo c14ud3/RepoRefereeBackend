@@ -112,18 +112,18 @@ class TOXICITY_DEFINITIONS
 
 	public const PROMPT_NEGATIVE_COMMENTS = [
 		"IdentityAttackNameCalling" => [
-			"Unfortunately I am not programmer and I am not skilled enough to implement it myself.", // Ehsani et. al. "Incivility ..."
+			"Unfortunately I am not programmer and I am not skilled enough to implement it myself.", // Ehsani et al. "Incivility ..."
 		],
 	  
 		"Insult" => [
 		],
 	  
 		"Vulgarity" => [
-			"> This is a big fuckup IMHO. Profanity aside, you may have a point. I'll take a patch.", // Ehsani et. al. "Incivility ..."
+			"> This is a big fuckup IMHO. Profanity aside, you may have a point. I'll take a patch.", // Ehsani et al. "Incivility ..."
 		],
 	  
 		"Flirtation" => [
-			"@[user_name] there are plans to have it done this via a composer plugin or extension or configuration (via composer as a service future api), that hopefully soon :baby:", // Ehsani et. al. "Incivility ..."
+			"@[user_name] there are plans to have it done this via a composer plugin or extension or configuration (via composer as a service future api), that hopefully soon :baby:", // Ehsani et al. "Incivility ..."
 		],
 	  
 		"ReferenceToSexualActivities" => [
@@ -162,7 +162,7 @@ class TOXICITY_DEFINITIONS
 			"-> WFM", // BugZilla
 			"@[user_name] We could obviously just WONTFIX the issue instead, if you think that this change is unnecessary.", // pdf.js
 			"Huh, but that's clearly already mentioned under the section [url].", // pdf.js
-			"Oh, when was that released?", // Ehsani et. al. "Incivility ..."
+			"Oh, when was that released?", // Ehsani et al. "Incivility ..."
 		],
 	];
 
