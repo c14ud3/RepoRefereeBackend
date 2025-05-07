@@ -154,7 +154,6 @@ class TOXICITY_DEFINITIONS
 	  
 		"Impatience" => [
 			"Need to remove \" Status: VERIFIED FIXED\" It will not let me do that.", // BugZilla
-			"The problem still persists today so I shall move to using another browser from now on or until I hear that a new update to Firefox has produced a solution.", // BugZilla
 			"This issue with \"GPU process\" is still there, maybe its now more exacerbated... Why on low priority?", // BugZilla
 		],
 	  
