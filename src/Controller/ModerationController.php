@@ -57,7 +57,7 @@ final class ModerationController extends AbstractController
 
 		$moderations = $em->getRepository(Moderation::class)->findBy(
 			$criteria,
-			['Timestamp' => $param_order == 'newest' ? 'DESC' : 'ASC'],
+			['id' => $param_order == 'newest' ? 'DESC' : 'ASC'],
 		);
 
 		$return = [];
