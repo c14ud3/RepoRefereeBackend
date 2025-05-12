@@ -157,6 +157,7 @@ final class ModerationController extends AbstractController
 		$moderation->setSatisfactionGuidelinesReference(Satisfaction::from($_POST['satisfactionGuidelinesReference']));
 		$moderation->setSatisfactionRephrasingOptions(Satisfaction::from($_POST['satisfactionRephrasingOptions']));
 		$moderation->setRemarks($_POST['remarks']);
+		$moderation->setTimestamp(new \DateTime('now', new \DateTimeZone('Europe/Zurich')));
 		
 		$em->persist($moderation);
 		$em->flush();
