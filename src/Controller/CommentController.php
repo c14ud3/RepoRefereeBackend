@@ -7,7 +7,6 @@ use App\Entity\Moderation;
 use App\Model\CommentsLogSource;
 use App\Service\AuthService;
 use App\Service\CommentLogService;
-use App\Service\GoogleSheetsService;
 use App\Service\RepoRefereeGPTService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -84,27 +83,9 @@ final class CommentController extends AbstractController
 				CommentsLogSource::BUGZILLA
 			);
 
-			// * If toxic: add Comment & Response to Google Sheets & Moderation DB
+			// * If toxic: add Comment & Response to Moderation DB
 			if($response['TEXT_TOXICITY'] ?? false)
 			{
-				// Add comment to Google Sheets
-				try
-				{
-					$googleSheetsService = new GoogleSheetsService();
-					$googleSheetsService->newRow([
-						$REQUESTDATA['url'] ?? '',
-						$REQUESTDATA['comment'] ?? '',
-						$response['TOXICITY_REASONS'] ?? '',
-						$response['VIOLATED_GUIDELINE'] ?? '',
-						implode(PHP_EOL, ($response['REPHRASED_TEXT_OPTIONS'] ?? [])),
-					]);
-				}
-				catch(Exception $e)
-				{
-					return new Response('Error with Google Sheets API: ' . $e->getMessage(), 502);
-				}
-
-				// Add comment to Moderation DB
 				$moderation = new Moderation();
 				$moderation->setComment($commentLog);
 				$moderation->setRemarks('');
