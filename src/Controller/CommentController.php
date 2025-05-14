@@ -8,6 +8,7 @@ use App\Model\CommentsLogSource;
 use App\Service\AuthService;
 use App\Service\CommentLogService;
 use App\Service\RepoRefereeGPTService;
+use App\Service\RepoRefereeGroqService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use OpenAI\Exceptions\TransporterException;
@@ -20,6 +21,7 @@ final class CommentController extends AbstractController
     #[Route('/comment/{auth}', name: 'comment')]
     public function comment(
 		RepoRefereeGPTService $gpt,
+		RepoRefereeGroqService $groq,
 		EntityManagerInterface $em,
 		$auth
 	): Response
@@ -60,13 +62,28 @@ final class CommentController extends AbstractController
 					'VIOLATED_GUIDELINE' => $previousCommentData[0]->getViolatedGuideline(),
 					'REPHRASED_TEXT_OPTIONS' => json_decode($previousCommentData[0]->getRephrasedTextOptions()),
 				]));
+
+			$commentIsToxic = false;
 			
 			// * Request to ChatGPT
-			$response = $gpt->request(
+			$gptResponse = $gpt->request(
 				strval($REQUESTDATA['title']),
 				strval($REQUESTDATA['comment']),
 				$REQUESTDATA['contextComments']
 			);
+
+			// * If toxic: Request to Groq
+			if($gptResponse['TEXT_TOXICITY'] ?? false)
+			{
+				$groqResponse = $groq->request(
+					strval($REQUESTDATA['title']),
+					strval($REQUESTDATA['comment']),
+					$REQUESTDATA['contextComments']
+				);
+
+				if($groqResponse['TEXT_TOXICITY'] ?? false)
+					$commentIsToxic = true;
+			}
 
 			// * Log the request
 			$commentLogService = new CommentLogService();
@@ -76,15 +93,15 @@ final class CommentController extends AbstractController
 				$REQUESTDATA['title'] ?? '',
 				$REQUESTDATA['comment'] ?? '',
 				$contextComments ?? [],
-				$response['TEXT_TOXICITY'] ?? false,
-				$response['TOXICITY_REASONS'] ?? '',
-				$response['VIOLATED_GUIDELINE'] ?? '',
-				$response['REPHRASED_TEXT_OPTIONS'] ?? [],
+				$commentIsToxic,
+				$gptResponse['TOXICITY_REASONS'] ?? '',
+				$gptResponse['VIOLATED_GUIDELINE'] ?? '',
+				$gptResponse['REPHRASED_TEXT_OPTIONS'] ?? [],
 				CommentsLogSource::BUGZILLA
 			);
 
-			// * If toxic: add Comment & Response to Moderation DB
-			if($response['TEXT_TOXICITY'] ?? false)
+			// * If toxic again: add Comment & Response to Moderation DB
+			if($commentIsToxic)
 			{
 				$moderation = new Moderation();
 				$moderation->setComment($commentLog);
@@ -94,7 +111,11 @@ final class CommentController extends AbstractController
 				$em->flush();
 			}
 
-			return new Response(json_encode($response));
+			// Make a deep copy of the GPT response & add the toxicity status
+			$returnResponse = array_replace([], $gptResponse);
+			$returnResponse['TEXT_TOXICITY'] = $commentIsToxic;
+
+			return new Response(json_encode($returnResponse));
 		}
 		catch(TransporterException $e)
 		{
