@@ -7,6 +7,7 @@ use App\Model\CommentsLogSource;
 use App\Service\AuthService;
 use App\Service\CommentLogService;
 use App\Service\RepoRefereeGPTService;
+use App\Service\RepoRefereeGroqService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,6 +18,7 @@ final class GitHubController extends AbstractController
     #[Route('/github/hook/{auth}', name: 'app_git_hub')]
     public function index(
 		RepoRefereeGPTService $gpt,
+		RepoRefereeGroqService $groq,
 		EntityManagerInterface $em,
 		$auth
 	): Response
@@ -67,12 +69,27 @@ final class GitHubController extends AbstractController
 			return new Response('Request from or to Bot detected. Ignoring.');
 		}
 
+		$commentIsToxic = false;
+
 		// * Request to ChatGPT
-		$response = $gpt->request(
+		$gptResponse = $gpt->request(
 			$title,
 			$comment,
 			$contextComments
 		);
+
+		// * If toxic: Request to Groq
+		if($gptResponse['TEXT_TOXICITY'] ?? false)
+		{
+			$groqResponse = $groq->request(
+				$title,
+				$comment,
+				$contextComments
+			);
+
+			if($groqResponse['TEXT_TOXICITY'] ?? false)
+				$commentIsToxic = true;
+		}
 
 		// * Log the request
 		$commentLogService = new CommentLogService();
@@ -82,15 +99,15 @@ final class GitHubController extends AbstractController
 			$title,
 			$comment,
 			$contextComments,
-			$response['TEXT_TOXICITY'] ?? false,
-			$response['TOXICITY_REASONS'] ?? '',
-			$response['VIOLATED_GUIDELINE'] ?? '',
-			$response['REPHRASED_TEXT_OPTIONS'] ?? [],
+			$commentIsToxic,
+			$gptResponse['TOXICITY_REASONS'] ?? '',
+			$gptResponse['VIOLATED_GUIDELINE'] ?? '',
+			$gptResponse['REPHRASED_TEXT_OPTIONS'] ?? [],
 			CommentsLogSource::from(strtoupper(explode(':', $auth)[0]))
 		);
 
-		// * If toxic: add Comment & Response Moderation DB
-		if($response['TEXT_TOXICITY'] ?? false)
+		// * If toxic again: add Comment & Response Moderation DB
+		if($commentIsToxic)
 		{
 			// Add comment to Moderation DB
 			$moderation = new Moderation();

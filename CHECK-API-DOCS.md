@@ -10,10 +10,10 @@ The following attributes have to be transmitted in the body of the request with 
 
 | Attribute         | Expected content                                             |
 | ---------------   | ------------------------------------------------------------ |
-| `url`             | (STRING) URL to the comment (used for link in Google Sheets) |
+| `url`             | (STRING) URL to the comment (used for link in moderation UI) |
 | `title`           | (STRING) Title of the conversation/bug                       |
 | `comment`         | (STRING) Comment to be checked                               |
-| `contextComments` | (ARRAY with strings) Previous comments            |
+| `contextComments` | (ARRAY with strings) Previous comments                       |
 
 ### Example request
 ```Python
@@ -50,8 +50,8 @@ If everything fine:
   ]
 }
 ```
-Additionally: A new line gets created in Google Docs for moderators.
-If the same request has already been sent before (meaning `url` and `comment` are equal), the response is the same as above, but no extra line gets created within the Google Sheets.
+Additionally: The comment is added to the moderation UI.
+If the same request has already been sent before (meaning `url` and `comment` are equal), the response is the same as above, but the comment is not added to the moderation UI again.
 ## Exceptions
 - If the request to ChatGPT took more than 20s: `Error 408`
 - If `AUTH-TOKEN` wrong: `Eror 401`
