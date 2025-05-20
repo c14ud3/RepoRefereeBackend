@@ -71,7 +71,7 @@ final class ModerationController extends AbstractController
 					'toxicityLevel' => $moderation->getToxicityLevel(),
 					'title' => $moderation->getComment()->getTitle(),
 					'url' => $moderation->getComment()->getUrl(),
-					'timestamp' => $moderation->getTimestamp()->format('d.m.y H:i'),
+					'timestamp' => $moderation->getComment()->getTimestamp()->format('d.m.y H:i'),
 				];
 			}
 		}
