@@ -48,7 +48,7 @@ final class ModerationController extends AbstractController
 			return new Response('Unauthorized', 401);
 		
         // separate params
-		list($param_filter, $param_order) = explode('-', $params);
+		list($param_filter, $param_order, $show_all_comments) = explode('-', $params);
 
 		$criteria = [];
 		if($param_filter == 'open') $criteria = ['ToxicityLevel' => null];
@@ -66,13 +66,18 @@ final class ModerationController extends AbstractController
 
 		foreach($moderations as $moderation) {
 			if($moderation->getComment()->getSource() == $sessionSource) {
-				$return[] = [
-					'id' => $moderation->getId(),
-					'toxicityLevel' => $moderation->getToxicityLevel(),
-					'title' => $moderation->getComment()->getTitle(),
-					'url' => $moderation->getComment()->getUrl(),
-					'timestamp' => $moderation->getComment()->getTimestamp()->format('d.m.y H:i'),
-				];
+				if (
+					$show_all_comments == 'true' ||
+					$moderation->getComment()->getTimestamp() > new \DateTime('2025-05-20 00:00:00', new \DateTimeZone('Europe/Zurich'))
+				) {
+					$return[] = [
+						'id' => $moderation->getId(),
+						'toxicityLevel' => $moderation->getToxicityLevel(),
+						'title' => $moderation->getComment()->getTitle(),
+						'url' => $moderation->getComment()->getUrl(),
+						'timestamp' => $moderation->getComment()->getTimestamp()->format('d.m.y H:i'),
+					];
+				}
 			}
 		}
 
