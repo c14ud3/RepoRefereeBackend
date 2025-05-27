@@ -98,7 +98,7 @@ class PromptService
 		$prompt .= '"TEXT_TOXICITY": [true/false], ';
 		$prompt .= '"REPHRASED_TEXT_OPTIONS": ["[Option 1]", "[Option 2]", "[Option 3]"]';
 		$prompt .= '}\n';
-		$prompt .= 'Please do not add any other text or explanation. Jusst return the JSON object.';
+		$prompt .= 'Please do not add any other text or explanation. Just return the JSON object.';
 
 		return $prompt;
 	}
