@@ -20,13 +20,13 @@ final class ModerationController extends AbstractController
     #[Route('/moderation', name: 'app_moderation_without_auth')]
     public function indexWithoutAuth(): Response
     {
-        return $this->redirectToRoute('app_moderation_comments', ['auth' => '-']);
+        return $this->redirectToRoute('app_moderation_comments', ['auth' => '-', 'user' => '-']);
     }
 
-	#[Route('/moderation/{auth}', name: 'app_moderation')]
-    public function index($auth): Response
+	#[Route('/moderation/{auth}/{user}', name: 'app_moderation')]
+    public function index($auth, $user): Response
     {
-        return $this->redirectToRoute('app_moderation_comments', ['auth' => $auth]);
+        return $this->redirectToRoute('app_moderation_comments', ['auth' => $auth, 'user' => $user]);
     }
 
 	#[Route('/moderation/{auth}/{user}/comments', name: 'app_moderation_comments')]
