@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Moderation;
 use App\Model\CommentsLogSource;
+use App\Model\User;
 use App\Service\AuthService;
 use App\Service\CommentLogService;
 use App\Service\RepoRefereeGPTService;
@@ -109,12 +110,15 @@ final class GitHubController extends AbstractController
 		// * If toxic again: add Comment & Response Moderation DB
 		if($commentIsToxic)
 		{
-			// Add comment to Moderation DB
-			$moderation = new Moderation();
-			$moderation->setComment($commentLog);
-			$moderation->setRemarks('');
-			$moderation->setTimestamp(new \DateTime('now', new \DateTimeZone('Europe/Zurich')));
-			$em->persist($moderation);
+			// Add comment to Moderation DB for each Moderator
+			foreach(User::cases() as $user) {
+				$moderation = new Moderation();
+				$moderation->setComment($commentLog);
+				$moderation->setRemarks('');
+				$moderation->setTimestamp(new \DateTime('now', new \DateTimeZone('Europe/Zurich')));
+				$moderation->setUser($user);
+				$em->persist($moderation);
+			}
 			$em->flush();
 		}
 

@@ -9,6 +9,7 @@ use App\Model\TimeSelector;
 use App\Model\ToxicityLevel;
 use App\Service\AuthService;
 use App\Service\ModerationService;
+use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,29 +29,36 @@ final class ModerationController extends AbstractController
         return $this->redirectToRoute('app_moderation_comments', ['auth' => $auth]);
     }
 
-	#[Route('/moderation/{auth}/comments', name: 'app_moderation_comments')]
-    public function comments($auth): Response
+	#[Route('/moderation/{auth}/{user}/comments', name: 'app_moderation_comments')]
+    public function comments($auth, $user): Response
     {
         // * Check authentication
 		if (!AuthService::moderation($auth))
 			return new Response('Unauthorized', 401);
+
+		$user = UserService::get($user);
+		if($user === null) return new Response('Unauthorized', 401);
 		
         return $this->render('moderation/comments.html.twig', [
 			'auth' => $auth,
+			'user' => $user->value,
         ]);
     }
 
-	#[Route('/moderation/{auth}/api/comments/{params}', name: 'api_moderation_comments')]
-    public function commentsApi(EntityManagerInterface $em, $auth, $params): Response
+	#[Route('/moderation/{auth}/{user}/api/comments/{params}', name: 'api_moderation_comments')]
+    public function commentsApi(EntityManagerInterface $em, $auth, $user, $params): Response
     {
 		// * Check authentication
 		if (!AuthService::moderation($auth))
 			return new Response('Unauthorized', 401);
+
+		$user = UserService::get($user);
+		if($user === null) return new Response('Unauthorized', 401);
 		
         // separate params
 		list($param_filter, $param_order, $show_all_comments) = explode('-', $params);
 
-		$criteria = [];
+		$criteria = ['User' => $user];
 		if($param_filter == 'open') $criteria = ['ToxicityLevel' => null];
 		else if(in_array($param_filter, [0, 1, 2]))
 			$criteria = ['ToxicityLevel' => ToxicityLevel::from(intval($param_filter))];
@@ -84,18 +92,26 @@ final class ModerationController extends AbstractController
 		return new Response(json_encode($return));
     }
 
-	#[Route('/moderation/{auth}/comment/{comment_id}', name: 'app_moderation_comment')]
-    public function comment(EntityManagerInterface $em, $auth, $comment_id): Response
+	#[Route('/moderation/{auth}/{user}/comment/{comment_id}', name: 'app_moderation_comment')]
+    public function comment(EntityManagerInterface $em, $auth, $user, $comment_id): Response
     {
 		// * Check authentication
 		if (!AuthService::moderation($auth))
 			return new Response('Unauthorized', 401);
 
-        $moderation = $em->getRepository(Moderation::class)->find($comment_id);
+		$user = UserService::get($user);
+		if($user === null) return new Response('Unauthorized', 401);
 
-		if($moderation->getComment()->getSource() != CommentsLogSource::from(strtoupper(explode(':', $auth)[0]))) {
+        $moderation = $em->getRepository(Moderation::class)->findBy([
+			'id' => $comment_id,
+			'User' => $user
+		]);
+
+		if(count($moderation) != 1) return new Response('Comment not found.', 404);
+		$moderation = $moderation[0];
+
+		if($moderation->getComment()->getSource() != CommentsLogSource::from(strtoupper(explode(':', $auth)[0])))
 			return new Response('Unauthorized', 401);
-		}
 
 		$return_moderation = [];
 		$return_comment = [];
@@ -136,6 +152,7 @@ final class ModerationController extends AbstractController
 		
 		return $this->render('moderation/detail.html.twig', [
 			'auth' => $auth,
+			'user' => $user->value,
 			'comment_found' => $moderation != null,
 			'moderation' => $return_moderation,
 			'comment' => $return_comment,
@@ -143,14 +160,23 @@ final class ModerationController extends AbstractController
         ]);
     }
 
-	#[Route('/moderation/{auth}/api/comment/{moderation_id}', name: 'api_moderation_comment')]
-    public function commentApi(EntityManagerInterface $em, $auth, $moderation_id): Response
+	#[Route('/moderation/{auth}/{user}/api/comment/{moderation_id}', name: 'api_moderation_comment')]
+    public function commentApi(EntityManagerInterface $em, $auth, $user, $moderation_id): Response
     {
 		// * Check authentication
 		if (!AuthService::moderation($auth))
 			return new Response('Unauthorized', 401);
 
-        $moderation = $em->getRepository(Moderation::class)->find($moderation_id);
+		$user = UserService::get($user);
+		if($user === null) return new Response('Unauthorized', 401);
+
+        $moderation = $em->getRepository(Moderation::class)->findBy([
+			'id' => $moderation_id,
+			'User' => $user
+		]);
+
+		if(count($moderation) != 1) return new Response('Comment not found.', 404);
+		$moderation = $moderation[0];
 
 		if($moderation->getComment()->getSource() != CommentsLogSource::from(strtoupper(explode(':', $auth)[0]))) {
 			return new Response('Unauthorized', 401);

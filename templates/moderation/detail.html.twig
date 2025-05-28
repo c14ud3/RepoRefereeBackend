@@ -2,7 +2,7 @@
 
 {% block body %}
 	{# Back Button #}
-	<a class="btn btn-primary mb-4" href="{{ path('app_moderation_comments', {'auth': auth}) }}" role="button">Back to list</a>
+	<a class="btn btn-primary mb-4" href="{{ path('app_moderation_comments', {'auth': auth, 'user': user}) }}" role="button">Back to list</a>
 
 	{# Comment Details #}
 	{% if not comment_found %}
@@ -212,7 +212,7 @@
 		}
 
 		$.ajax({
-			url: "{{ path('api_moderation_comment', {'auth': auth, 'moderation_id': moderation.id}) }}",
+			url: "{{ path('api_moderation_comment', {'auth': auth, 'user': user, 'moderation_id': moderation.id}) }}",
 			type: "POST",
 			data: {
 				"toxicityLevel": $("input[name='toxicityLevel']:checked").val(),
@@ -224,7 +224,7 @@
 			},
 			success: () => {
 				alert("Data saved successfully.");
-				window.location.href = "{{ path('app_moderation_comments', {'auth': auth}) }}";
+				window.location.href = "{{ path('app_moderation_comments', {'auth': auth, 'user': user}) }}";
 			},
 			error: () => {
 				alert("There was an error saving the data.");

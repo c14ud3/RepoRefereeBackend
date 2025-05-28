@@ -52,7 +52,7 @@
 {% block javascript %}
 	const loadContents = () => {
 		$.ajax({
-			url: "{{ path('api_moderation_comments', {'auth': auth, 'params': '__PARAMS__'}) }}"
+			url: "{{ path('api_moderation_comments', {'auth': auth, 'user': user, 'params': '__PARAMS__'}) }}"
 				.replace('__PARAMS__',
 					($("#filterSelect").val() ?? "all") + '-' +
 					($("#orderSelect").val() ?? "newest") + '-' +
@@ -75,7 +75,7 @@
 					else
 						badge = `<span class="badge badge-pill badge-secondary">open</span>`;
 
-					var handlingURL = "{{ path('app_moderation_comment', {'auth': auth, 'comment_id': '__COMMENT-ID__'}) }}"
+					var handlingURL = "{{ path('app_moderation_comment', {'auth': auth, 'user': user, 'comment_id': '__COMMENT-ID__'}) }}"
 						.replace('__COMMENT-ID__', comment.id);
 
 					htmlTable += `

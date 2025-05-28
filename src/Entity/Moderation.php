@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Model\Satisfaction;
 use App\Model\TimeSelector;
+use App\Model\User;
 use App\Repository\ModerationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -41,6 +42,9 @@ class Moderation
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $Timestamp = null;
+
+    #[ORM\Column(nullable: true, enumType: User::class)]
+    private ?User $User = null;
 
     public function getId(): ?int
     {
@@ -139,6 +143,18 @@ class Moderation
     public function setTimestamp(\DateTimeInterface $Timestamp): static
     {
         $this->Timestamp = $Timestamp;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->User;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->User = $user;
 
         return $this;
     }

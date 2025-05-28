@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\CommentsLog;
 use App\Entity\Moderation;
 use App\Model\CommentsLogSource;
+use App\Model\User;
 use App\Service\AuthService;
 use App\Service\CommentLogService;
 use App\Service\RepoRefereeGPTService;
@@ -100,14 +101,18 @@ final class CommentController extends AbstractController
 				CommentsLogSource::BUGZILLA
 			);
 
-			// * If toxic again: add Comment & Response to Moderation DB
+			// * If toxic again: add Comment & Response to Moderation DB...
 			if($commentIsToxic)
 			{
-				$moderation = new Moderation();
-				$moderation->setComment($commentLog);
-				$moderation->setRemarks('');
-				$moderation->setTimestamp(new \DateTime('now', new \DateTimeZone('Europe/Zurich')));
-				$em->persist($moderation);
+				// ... for each Moderator
+				foreach(User::cases() as $user) {
+					$moderation = new Moderation();
+					$moderation->setComment($commentLog);
+					$moderation->setRemarks('');
+					$moderation->setTimestamp(new \DateTime('now', new \DateTimeZone('Europe/Zurich')));
+					$moderation->setUser($user);
+					$em->persist($moderation);
+				}
 				$em->flush();
 			}
 
@@ -121,7 +126,7 @@ final class CommentController extends AbstractController
 		{
 			// check for Timeout
 			if (str_contains($e->getMessage(), 'cURL error 28'))
-				return new Response('The request to ChatGPT took too long.', 408);
+				return new Response('The request to the LLM took too long.', 408);
 			return new Response($e->getMessage(), 500);
 		}
 		catch(Exception $e)
