@@ -63,10 +63,16 @@ final class ModerationController extends AbstractController
 		else if(in_array($param_filter, [0, 1, 2]))
 			$criteria = ['ToxicityLevel' => ToxicityLevel::from(intval($param_filter))];
 
-		$moderations = $em->getRepository(Moderation::class)->findBy(
-			$criteria,
-			['id' => $param_order == 'newest' ? 'DESC' : 'ASC'],
-		);
+		$moderations = $em->getRepository(Moderation::class)->findBy($criteria);
+
+		// sort the moderations according to the order parameter
+		usort($moderations, function($a, $b) use ($param_order) {
+			if ($param_order == 'newest') {
+				return $b->getComment()->getTimestamp() <=> $a->getComment()->getTimestamp();
+			} else {
+				return $a->getComment()->getTimestamp() <=> $b->getComment()->getTimestamp();
+			}
+		});
 
 		$return = [];
 
